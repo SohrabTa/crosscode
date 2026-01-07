@@ -22,7 +22,8 @@ dependencies = [
     "pandas",
     "matplotlib",
     "schedulefree",
-    "zstandard"
+    "zstandard",
+    "biopython>=1.86",
 ]
 
 [project.optional-dependencies]
