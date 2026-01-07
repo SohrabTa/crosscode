@@ -42,6 +42,7 @@ class TokenSequenceLoader:
         batch_size: int,
         shuffle_buffer_size: int | None = None,
         cache_dir: str | None = None,
+        preprocess_text_fn: Any | None = None,
     ):
         hf_dataset = cast(
             IterableDataset,
@@ -59,6 +60,7 @@ class TokenSequenceLoader:
             batch_size=batch_size,
             shuffle_buffer_size=shuffle_buffer_size,
             cache_dir=cache_dir,
+            preprocess_text_fn=preprocess_text_fn,
         )
 
     def __init__(
@@ -69,6 +71,7 @@ class TokenSequenceLoader:
         batch_size: int,
         shuffle_buffer_size: int | None = None,
         cache_dir: str | None = None,
+        preprocess_text_fn: Any | None = None,
     ):
         self._hf_dataset = hf_dataset
         self._cache_dir = cache_dir
@@ -76,11 +79,14 @@ class TokenSequenceLoader:
         self._sequence_length = sequence_length
         self._shuffle_buffer_size = shuffle_buffer_size
         self._batch_size = batch_size
+        self._preprocess_text_fn = preprocess_text_fn
 
     def _raw_tokens_sequence_iterator_S(self) -> Iterator[torch.Tensor]:
         """Iterator over raw tokens sequences. Each item is a single tokenized sequence from the dataset."""
         for example in self._hf_dataset:
             text = cast(dict[str, Any], example)["text"]
+            if self._preprocess_text_fn is not None:
+                text = self._preprocess_text_fn(text)
             tokens = self._tokenizer(text, return_tensors="pt")["input_ids"]
             tokens = cast(torch.Tensor, tokens)
             assert len(tokens.shape) == 2, f"tokens.shape should be 2D but was {tokens.shape}"
