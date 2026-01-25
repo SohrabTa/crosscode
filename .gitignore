@@ -1,3 +1,7 @@
+# custom
+
+dataset/
+
 .vscode/settings.json
 
 wandb/
