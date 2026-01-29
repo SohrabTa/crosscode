@@ -1,4 +1,5 @@
-import fire  # type: ignore
+import fire
+from transformers import T5EncoderModel
 
 from crosscode.data.activations_dataloader import build_model_hookpoint_dataloader
 from crosscode.llms import build_llms
@@ -30,7 +31,7 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         case "groupmax":
             cc_act = GroupMaxActivation(k_groups=cfg.crosscoder.k, latents_size=cfg.crosscoder.n_latents)
 
-    d_model = llms[0].cfg.d_model
+    d_model = llms[0].config.d_model if isinstance(llms[0], T5EncoderModel) else llms[0].cfg.d_model
 
     crosscoder = ModelHookpointAcausalCrosscoder(
         n_models=len(llms),

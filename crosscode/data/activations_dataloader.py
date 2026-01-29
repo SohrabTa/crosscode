@@ -6,8 +6,8 @@ from typing import Generic, TypeVar
 
 import torch
 from einops import rearrange
-from transformer_lens import HookedTransformer  # type: ignore
-from transformers import PreTrainedTokenizerBase  # type: ignore
+from transformer_lens import HookedTransformer
+from transformers import PreTrainedTokenizerBase, T5EncoderModel
 
 from crosscode.data.activation_harvester import ActivationsHarvester
 from crosscode.data.shuffle import batch_shuffle_tensor_iterator_BX
@@ -45,7 +45,7 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
         self._token_sequence_loader = token_sequence_loader
         self._activations_harvester = activations_harvester
         self._yield_batch_size_B = yield_batch_size_B
-        self._device = self._activations_harvester._llms[0].W_E.device
+        self._device = self._activations_harvester._device
         self._shuffle_buffer_size = shuffle_buffer_size
         norm_scaling_factors_MP = estimate_norm_scaling_factor_X(
             self._iterate_activations_BMPD(),
@@ -113,28 +113,38 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
 
 def build_model_hookpoint_dataloader(
     cfg: DataConfig,
-    llms: list[HookedTransformer],
+    llms: list[HookedTransformer | T5EncoderModel],
     hookpoints: list[str],
     batch_size: int,
     cache_dir: str,
 ) -> ModelHookpointActivationsDataloader:
     tokenizer = llms[0].tokenizer
-    assert all(
-        llm.tokenizer.special_tokens_map == tokenizer.special_tokens_map  # type: ignore
-        for llm in llms
-    ), "all tokenizers should have the same special tokens"
+    assert all(tokenizer.special_tokens_map == llm.tokenizer.special_tokens_map for llm in llms), (
+        "all tokenizers should have the same special tokens"
+    )
     if not isinstance(tokenizer, PreTrainedTokenizerBase):
         raise ValueError("Tokenizer is not a PreTrainedTokenizerBase")
 
     # first, get an iterator over sequences of tokens
-    token_sequence_loader = TokenSequenceLoader.from_hf_dataset_name(
-        hf_dataset_name=cfg.token_sequence_loader.hf_dataset_name,
-        sequence_length=cfg.token_sequence_loader.sequence_length,
-        cache_dir=cache_dir,
-        tokenizer=tokenizer,
-        batch_size=cfg.activations_harvester.harvesting_batch_size,
-        shuffle_buffer_size=cfg.token_sequence_loader.sequences_shuffle_buffer_size,
-    )
+    if cfg.token_sequence_loader.type == "huggingface":
+        token_sequence_loader = TokenSequenceLoader.from_hf_dataset_name(
+            hf_dataset_name=cfg.token_sequence_loader.hf_dataset_name,
+            sequence_length=cfg.token_sequence_loader.sequence_length,
+            cache_dir=cache_dir,
+            tokenizer=tokenizer,
+            batch_size=cfg.activations_harvester.harvesting_batch_size,
+            shuffle_buffer_size=cfg.token_sequence_loader.sequences_shuffle_buffer_size,
+        )
+    elif cfg.token_sequence_loader.type == "fasta":
+        token_sequence_loader = TokenSequenceLoader.from_fasta_path(
+            fasta_path=cfg.token_sequence_loader.fasta_path,
+            max_sequence_length=cfg.token_sequence_loader.max_sequence_length,
+            tokenizer=tokenizer,
+            batch_size=cfg.activations_harvester.harvesting_batch_size,
+            shuffle_buffer_size=cfg.token_sequence_loader.sequences_shuffle_buffer_size,
+        )
+    else:
+        raise ValueError(f"Unsupported dataset type: {cfg.token_sequence_loader.type}")
 
     # Create activations cache directory if cache is enabled
     activations_cache_dir = None

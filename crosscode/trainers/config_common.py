@@ -10,26 +10,37 @@ from crosscode.utils import BaseModel
 
 
 class HuggingfaceTextDatasetConfig(BaseModel):
+    type: Literal["huggingface"] = "huggingface"
     hf_dataset_name: str = "monology/pile-uncopyrighted"
     sequence_length: int = 2048
     sequences_shuffle_buffer_size: int | None = None
+
+
+class FastaDatasetConfig(BaseModel):
+    type: Literal["fasta"] = "fasta"
+    fasta_path: str
+    max_sequence_length: int = 512
+    sequences_shuffle_buffer_size: int | None = None
+
+
+TokenSequenceLoaderConfig = HuggingfaceTextDatasetConfig | FastaDatasetConfig
 
 
 class LLMConfig(BaseModel):
     name: str | None = None
     revision: str | None = None
 
-    base_archicteture_name: str | None = None
+    base_architecture_name: str | None = None
     hf_model_name: str | None = None
 
     def model_post_init(self, __context: Any) -> None:
         super().model_post_init(__context)
         assert xor(
             (self.name is not None),
-            (self.base_archicteture_name is not None and self.hf_model_name is not None),
+            (self.base_architecture_name is not None and self.hf_model_name is not None),
         ), (
             "must provide either name (to load from official model list)"
-            " or base_archicteture_name and hf_model_name (to load from huggingface)"
+            " or base_architecture_name and hf_model_name (to load from huggingface)"
         )
 
 
@@ -58,7 +69,9 @@ class ActivationsHarvesterConfig(BaseModel):
 
 
 class DataConfig(BaseModel):
-    token_sequence_loader: HuggingfaceTextDatasetConfig = HuggingfaceTextDatasetConfig()
+    token_sequence_loader: TokenSequenceLoaderConfig = Field(
+        discriminator="type", default_factory=HuggingfaceTextDatasetConfig
+    )
     activations_harvester: ActivationsHarvesterConfig
     n_tokens_for_norm_estimate: int = 100_000
     activations_shuffle_buffer_size: int | None = None
