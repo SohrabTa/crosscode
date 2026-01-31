@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 from einops import pack
@@ -83,22 +83,48 @@ class ProtT5Strategy(HarvestingStrategy):
         # If it's an EncoderDecoder model, we harvest from the encoder
         model_to_run = llm.encoder if hasattr(llm, "encoder") else llm
 
-        attention_mask = (sequence_HS != 0).long().to(device)  # Assuming 0 is pad
-        with torch.no_grad():
-            output = model_to_run(
-                input_ids=sequence_HS.to(device),
-                attention_mask=attention_mask,
-                output_hidden_states=True,
-            )
+        cache: dict[str, torch.Tensor] = {}
+        hooks = []
 
-        cache = {}
+        def get_hook(name: str):
+            def hook(module: torch.nn.Module, input: Any, output: Any):
+                # T5 blocks return a tuple (hidden_states, [attention_outputs])
+                if isinstance(output, tuple):
+                    cache[name] = output[0].detach()
+                else:
+                    cache[name] = output.detach()
+
+            return hook
+
         for hookpoint in hookpoints:
             layer_idx = self.get_layer_index(hookpoint)
-            cache[hookpoint] = output.hidden_states[layer_idx]
+            # Support for "encoder.blocks.N.hook_resid_post" (1-indexed in config)
+            # or "encoder.final_layer_norm" for post-norm
+            if "blocks" in hookpoint:
+                target_module = model_to_run.block[layer_idx - 1]
+            elif "final_layer_norm" in hookpoint:
+                target_module = model_to_run.final_layer_norm
+            else:
+                raise ValueError(f"Unsupported hookpoint for ProtT5: {hookpoint}")
+
+            hooks.append(target_module.register_forward_hook(get_hook(hookpoint)))
+
+        attention_mask = (sequence_HS != 0).long().to(device)
+        try:
+            with torch.no_grad():
+                model_to_run(
+                    input_ids=sequence_HS.to(device),
+                    attention_mask=attention_mask,
+                )
+        finally:
+            for h in hooks:
+                h.remove()
 
         return cache
 
     def get_layer_index(self, hookpoint: str) -> int:
+        if "final_layer_norm" in hookpoint:
+            return 999  # Special index for final layer norm if needed
         return _get_layer(hookpoint)
 
 
