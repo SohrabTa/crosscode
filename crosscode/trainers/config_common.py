@@ -66,6 +66,8 @@ class ActivationsHarvesterConfig(BaseModel):
     inference_dtype: str = "float32"
     harvesting_batch_size: int
     cache_mode: CacheMode = "no_cache"
+    use_parallel_harvesting: bool = False
+    prefetch_buffer_size: int = 2
 
 
 class DataConfig(BaseModel):
