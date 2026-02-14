@@ -30,34 +30,6 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 1.  **Image Import:** Official NVIDIA PyTorch 25.12 image imported.
 2.  **Container Creation:** Created `pytorch-25.12` from the squashfs file.
 3.  **Interactive Test:** I successfully ran an interactive session with the mounts described above, verified WandB login, and ran a test training run.
+4.  **Profiling & Instrumentation:** Instrumented `BaseTrainer` to log VRAM (peak ~24GB), throughput (~48 steps/s), and data wait time (~0ms). Verified that `PrefetchingIterator` effectively masks activation harvesting latency. Full run on 3M sequences estimated at ~33 minutes.
 
 # Immediate Tasks
-
-### 1. Instrumentation & Profiling Code
-Modify the training script (`run.py`) or `activations_harvester.py` to enable a robust **Profiling Run**. We need to measure real-world performance, not theoretical estimates.
-*   **Configuration:** Use the config in `crosscode/trainers/topk_crosscoder/config.py`. Crosscoder latent dimension is **8192**. Limit the dataset to exactly **1024 protein sequences**.
-*   **Memory Profiling:** Implement logging to measure the *peak* VRAM usage.
-    *   *Critical:* Since ProtT5 and the Crosscoder share the same GPU, we need the total footprint. Use `torch.cuda.max_memory_allocated()`.
-    *   Calculate and log the model size (in MB and number of parameters) of the Crosscoder itself.
-*   **Throughput Profiling:** Measure wall-clock time for the total run and `steps_per_second`.
-*   **Concurrency Validation:** Validate that `PrefetchingIterator` is actually working in parallel.
-    *   Add a timer to measure "Data Wait Time" (how long the training loop waits for the `next(iterator)`).
-    *   If parallel harvesting is working, Data Wait Time should be near zero.
-
-### 2. Slurm Batch Script Generation
-Create a production-ready `submit.sh` Slurm script to execute this profiling run.
-*   **Resource Allocation:** Request 1 GPU from the `lrz-hgx-h100-94x4` partition.
-*   **Enroot Execution:** Use the provided documentation to determine the correct way to invoke Enroot non-interactively (e.g., `srun --container-image`).
-*   **Environment:** Set `HF_HOME` to `/workspace/data`, load `WANDB_API_KEY` from `wandb/api_key`, and ensure python path is correct.
-
-### 3. Execution & Reporting Plan
-*   Run the profiling job.
-*   Analyze the logs to answer:
-    1.  Does the total VRAM usage fit comfortably within the H100 limits, or are we close to OOM?
-    2.  Is the `PrefetchingIterator` effectively masking the harvesting latency?
-    3.  What is the projected time for a full training run based on these 1024 samples?
-
-# Output Requirements
-1.  Summarize findings from the LRZ documentation on how to run Enroot batch jobs.
-2.  Provide the **code modifications** in `run.py` and `activations_harvester.py` to log VRAM, Model Size, and Data Wait Time.
-3.  Provide the content of `submit.sh`.
