@@ -14,7 +14,19 @@ The training runs on the **LRZ (Leibniz Supercomputing Centre)** HPC cluster usi
 **File System & Mounts:**
 *   **Code Root:** `/dss/dsshome1/08/ga25ley2/code/crosscode/` mounted to `/workspace/crosscode` inside the container.
 *   **Data Root:** `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2` mounted to `/workspace/data` inside the container.
-*   **Artifacts:** Data, checkpoints, and `HF_HOME` reside in `/workspace/data`.
+*   **Artifacts:** The dataset, checkpoints, and `HF_HOME` reside in `/workspace/data`.
+
+**Protein Sequence Data:**
+*   **Path:** `/workspace/data/dataset/uniref50_3M_length_512.fasta`
+*   **Number of protein sequences:**
+    - 3 million protein sequences with sequence statistics:
+        - Total Sequences: 3,000,000
+        - Total Residues:  1,290,183,617
+        - Mean Length:     430.06
+        - Median Length:   429.00
+        - Min Length:      11.00
+        - Max Length:      512.00
+        - Std Dev Length:  50.32
 
 **Container Details:**
 *   Base: `nvcr.io/nvidia/pytorch:25.12-py3`
