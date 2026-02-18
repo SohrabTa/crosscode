@@ -1,5 +1,3 @@
-import queue
-import threading
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -43,17 +41,12 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
         yield_batch_size_B: int,
         n_tokens_for_norm_estimate: int,
         shuffle_buffer_size: int | None,
-        use_parallel_harvesting: bool = False,
-        prefetch_buffer_size: int = 2,
     ):
         self._token_sequence_loader = token_sequence_loader
         self._activations_harvester = activations_harvester
         self._yield_batch_size_B = yield_batch_size_B
         self._device = self._activations_harvester._device
         self._shuffle_buffer_size = shuffle_buffer_size
-        self._use_parallel_harvesting = use_parallel_harvesting
-        self._prefetch_buffer_size = prefetch_buffer_size
-
         norm_scaling_factors_MP = estimate_norm_scaling_factor_X(
             self._iterate_activations_BMPD(),
             n_tokens_for_norm_estimate,
@@ -80,24 +73,10 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
         return self._norm_scaling_factors_MP
 
     def _iterate_activations_HsMPD(self) -> Iterator[torch.Tensor]:
-        iterator = self._token_sequence_loader.get_sequences_batch_iterator()
-
-        if self._use_parallel_harvesting:
-            logger.info(f"Starting parallel harvesting with prefetch_buffer_size={self._prefetch_buffer_size}")
-            iterator = PrefetchingIterator(
-                iterator,
-                func=lambda seq: self._activations_harvester.get_activations_HSMPD(seq.tokens_HS)[
-                    ~seq.special_tokens_mask_HS
-                ],
-                buffer_size=self._prefetch_buffer_size,
-            )
-            for activations_HsMPD in iterator:
-                yield activations_HsMPD
-        else:
-            for seq in iterator:
-                activations_HSMPD = self._activations_harvester.get_activations_HSMPD(seq.tokens_HS)
-                activations_HsMPD = activations_HSMPD[~seq.special_tokens_mask_HS]
-                yield activations_HsMPD
+        for seq in self._token_sequence_loader.get_sequences_batch_iterator():
+            activations_HSMPD = self._activations_harvester.get_activations_HSMPD(seq.tokens_HS)
+            activations_HsMPD = activations_HSMPD[~seq.special_tokens_mask_HS]
+            yield activations_HsMPD
 
     def _iterate_activations_BMPD(self, scaling_factors_MP: torch.Tensor | None = None) -> Iterator[torch.Tensor]:
         iterator_HsMPD = self._iterate_activations_HsMPD()
@@ -187,73 +166,6 @@ def build_model_hookpoint_dataloader(
         yield_batch_size_B=batch_size,
         n_tokens_for_norm_estimate=cfg.n_tokens_for_norm_estimate,
         shuffle_buffer_size=cfg.activations_shuffle_buffer_size,
-        use_parallel_harvesting=cfg.activations_harvester.use_parallel_harvesting,
-        prefetch_buffer_size=cfg.activations_harvester.prefetch_buffer_size,
     )
 
     return activations_dataloader
-
-
-TIn = TypeVar("TIn")
-TOut = TypeVar("TOut")
-
-
-class PrefetchingIterator(Generic[TIn, TOut]):
-    """Iterates over an input iterator and applies a function in a background thread with CUDA stream overlap."""
-
-    def __init__(self, iterator: Iterator[TIn], func: callable, buffer_size: int = 2):
-        self._iterator = iterator
-        self._func = func
-        self._queue = queue.Queue(maxsize=buffer_size)
-        self._stop_event = threading.Event()
-        self._cuda_avail = torch.cuda.is_available()
-        # Dedicated stream for harvesting to allow overlap with training
-        self._stream = torch.cuda.Stream() if self._cuda_avail else None
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
-
-    def _run(self):
-        try:
-            for item in self._iterator:
-                if self._stop_event.is_set():
-                    break
-
-                if self._stream:
-                    with torch.cuda.stream(self._stream):
-                        result = self._func(item)
-                        # Ensure the tensor is not reused until the current stream is done
-                        # result.record_stream(self._stream) # Not strictly needed if it's new memory
-                else:
-                    result = self._func(item)
-
-                self._queue.put(result)
-        except Exception as e:
-            logger.error(f"Error in PrefetchingIterator background thread: {e}")
-            self._queue.put(e)
-        finally:
-            self._queue.put(StopIteration())
-
-    def __iter__(self) -> Iterator[TOut]:
-        return self
-
-    def __next__(self) -> TOut:
-        result = self._queue.get()
-        if isinstance(result, StopIteration):
-            raise StopIteration
-        if isinstance(result, Exception):
-            raise result
-
-        if self._stream:
-            # Sync the trainer's stream with the harvester's stream
-            torch.cuda.current_stream().wait_stream(self._stream)
-
-        return result
-
-    def __del__(self):
-        self._stop_event.set()
-        # Drain the queue to unblock the background thread if it's waiting on put()
-        while not self._queue.empty():
-            try:
-                self._queue.get_nowait()
-            except queue.Empty:
-                break
