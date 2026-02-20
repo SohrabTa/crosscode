@@ -8,6 +8,7 @@ from crosscode.models import (
 )
 from crosscode.models.cross_layer_transcoder import CrossLayerTranscoder
 from crosscode.models.initialization.anthropic_transpose import AnthropicTransposeInitCrossLayerTC
+from crosscode.models.initialization.data_point_init import DataPointInit
 
 
 def test_return_shapes():
@@ -32,6 +33,40 @@ def test_return_shapes():
     train_res = crosscoder.forward_train(activations_BMPD)
     assert train_res.recon_acts_BMPD.shape == activations_BMPD.shape
     assert train_res.latents_BL.shape == (batch_size, n_latents)
+
+
+def test_return_shapes_dpi():
+    n_models = 2
+    batch_size = 4
+    n_hookpoints = 6
+    d_model = 16
+    n_latents = 256
+    dec_init_norm = 1.0
+
+    data_points = torch.randn(n_latents, n_models, n_hookpoints, d_model)
+
+    init_strategy = DataPointInit(
+        data_points=data_points,
+        datapoint_scale=0.4,
+        dec_init_norm=dec_init_norm,
+    )
+
+    crosscoder = ModelHookpointAcausalCrosscoder(
+        n_models=n_models,
+        n_hookpoints=n_hookpoints,
+        d_model=d_model,
+        n_latents=n_latents,
+        activation_fn=ReLUActivation(),
+        init_strategy=init_strategy,
+    )
+
+    activations_BMPD = torch.randn(batch_size, n_models, n_hookpoints, d_model)
+    assert crosscoder.forward(activations_BMPD).shape == activations_BMPD.shape
+    train_res = crosscoder.forward_train(activations_BMPD)
+    assert train_res.recon_acts_BMPD.shape == activations_BMPD.shape
+    assert train_res.latents_BL.shape == (batch_size, n_latents)
+    assert not torch.isnan(crosscoder.W_enc_MPDL).any()
+    assert not torch.isnan(crosscoder.W_dec_LMPD).any()
 
 
 def test_batch_topk_activation():

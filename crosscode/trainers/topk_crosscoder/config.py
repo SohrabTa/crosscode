@@ -3,6 +3,8 @@ from crosscode.trainers.config_common import BaseExperimentConfig, BaseSparseCod
 
 
 class TopKCrosscoderConfig(BaseSparseCoder):
+    init_strategy: str = "anthropic_transpose"
+    datapoint_scale: float = 0.4
     dec_init_norm: float = 0.1
     k: int
 
