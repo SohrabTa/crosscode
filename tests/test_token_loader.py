@@ -25,6 +25,7 @@ def test_huggingface_text_dataset_token_sequence_loader():
     sequence_length = 7  # to test bos wrapping
 
     token_sequence_loader = TokenSequenceLoader(
+        dataset_source="huggingface",
         hf_dataset=mock_dataset,
         tokenizer=tokenizer,
         sequence_length=sequence_length,

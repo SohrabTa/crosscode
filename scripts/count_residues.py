@@ -41,5 +41,7 @@ def count_residues(fasta_path):
 
 
 if __name__ == "__main__":
-    path = "/home/sohrab/pCloudDrive/My Cloud/1 - Projects/Uni/04-25-26-ws/guided_research/interpreting_PLMs_with_SAEs/data/uniref50/uniref50_3M_length_512.fasta"
-    count_residues(path)
+    parser = argparse.ArgumentParser(description="Count residues in a FASTA file.")
+    parser.add_argument("fasta_path", type=str, help="Path to the FASTA file.")
+    args = parser.parse_args()
+    count_residues(args.fasta_path)
