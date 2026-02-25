@@ -1,4 +1,5 @@
 import os
+import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import datetime
@@ -55,6 +56,15 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
         self.epoch = 0
         self.unique_tokens_trained = 0
 
+        self._log_model_size()
+
+    def _log_model_size(self):
+        n_params = sum(p.numel() for p in self.model.parameters())
+        model_size_mb = n_params * 4 / (1024**2)  # Assuming float32
+        logger.info(f"Model size: {n_params:,} parameters ({model_size_mb:.2f} MB)")
+        self.wandb_run.summary["model/params"] = n_params
+        self.wandb_run.summary["model/size_mb"] = model_size_mb
+
     def train(self) -> None:
         # scaling_factors_MP = self.activations_dataloader.get_norm_scaling_factors_MP().to(self.device)
         epoch_dataloader = self.activations_dataloader.get_activations_iterator()
@@ -64,14 +74,20 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
             desc="Train Steps",
             smoothing=0.15,  # this loop is bursty because of activation harvesting
         ):
+            step_start_time = time.perf_counter()
             self._lr_step()
             self.optimizer.zero_grad()
 
             log_dicts: list[dict[str, float]] = []
             log = self.step % self.cfg.log_every_n_steps == 0
 
+            data_wait_time = 0.0
             for _ in range(self.cfg.gradient_accumulation_steps_per_batch):
-                loss, log_dict, tokens_trained = self.run_batch(next(epoch_dataloader), log)
+                data_start_time = time.perf_counter()
+                batch = next(epoch_dataloader)
+                data_wait_time += time.perf_counter() - data_start_time
+
+                loss, log_dict, tokens_trained = self.run_batch(batch, log)
                 if self.epoch == 0:
                     self.unique_tokens_trained += tokens_trained
 
@@ -81,10 +97,17 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
 
             self._after_forward_passes()
 
+            step_time = time.perf_counter() - step_start_time
             if log_dicts:
                 batch_log_dict_avgs = {
                     **{k: sum(v) / len(v) for k, v in dict_join(log_dicts).items()},
                     **self._step_logs(),
+                    "perf/data_wait_time": data_wait_time,
+                    "perf/step_time": step_time,
+                    "perf/steps_per_second": 1.0 / step_time if step_time > 0 else 0,
+                    "perf/peak_vram_gb": torch.cuda.max_memory_allocated() / (1024**3)
+                    if torch.cuda.is_available()
+                    else 0,
                 }
                 self.wandb_run.log(batch_log_dict_avgs, step=self.step)
 
