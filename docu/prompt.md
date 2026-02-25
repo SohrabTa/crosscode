@@ -44,5 +44,6 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 3.  **Interactive Test:** I successfully ran an interactive session with the mounts described above, verified WandB login, and ran a test training run.
 4.  **Profiling & Instrumentation:** Instrumented `BaseTrainer` to log VRAM (peak ~24GB), throughput (~48 steps/s), and data wait time (~0ms). Verified that `PrefetchingIterator` effectively masks activation harvesting latency. Full run on 3M sequences estimated at ~33 minutes.
 5.  **16k Latent Profiling**: Optimized training for 16k latents on H100 (80GB) by increasing batch size to 128. Achieved ~3,213 seq/sec throughput with ~73GB peak VRAM. Full 3M sequence run estimated at ~17 minutes.
+6. **16k Latent Profiling without prefetching**: Confirmed that disabling the `PrefetchingIterator` (with batch size 128) has a negligible impact on performance. Throughput remained at ~25.12 steps/sec with data wait time increasing only slightly to 0.34ms, indicating that GPU computation for 16k latents is large enough to naturally mask activation harvesting.
 
 # Immediate Tasks
