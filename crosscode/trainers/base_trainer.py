@@ -119,6 +119,17 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
 
         self.wandb_run.finish()
 
+        # Always save the final model at the end of training
+        final_checkpoint_path = self.save_dir / f"final_epoch_{self.epoch}_step_{self.step}"
+        if hasattr(self, "activations_dataloader") and hasattr(self.activations_dataloader, "get_scaling_factors"):
+            scaling_factors_MP = self.activations_dataloader.get_scaling_factors().to(self.device)
+            self.model.with_folded_scaling_factors(scaling_factors_MP).save(final_checkpoint_path)
+            logger.info(f"Saved final trained model to {final_checkpoint_path}")
+        else:
+            self.model.save(final_checkpoint_path)
+            logger.info(f"Saved final trained model to {final_checkpoint_path}")
+
+
     def _after_forward_passes(self): ...
 
     @abstractmethod
