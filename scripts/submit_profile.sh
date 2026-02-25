@@ -6,7 +6,7 @@
 #SBATCH -e logs/profile_%j.err
 
 # Define Configuration
-CONFIG_FILE="docu/profiling_16384_no_prefetch/profile_config.yaml"
+CONFIG_FILE="docu/final_profiling/profile_config.yaml"
 
 # Define Mounts
 CODE_DIR="/dss/dsshome1/08/ga25ley2/code/crosscode"
