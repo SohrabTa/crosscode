@@ -2,8 +2,8 @@
 #SBATCH -p lrz-hgx-h100-94x4
 #SBATCH --gres=gpu:1
 #SBATCH -t 01:00:00
-#SBATCH -o logs/profile_%j.out
-#SBATCH -e logs/profile_%j.err
+#SBATCH -o logs/train_%j.out
+#SBATCH -e logs/train_%j.err
 
 # Define Configuration
 CONFIG_FILE="training_config.yaml"
@@ -22,7 +22,7 @@ export PYTHONPATH="/workspace/crosscode"
 
 mkdir -p logs
 
-echo "Starting profiling run on $(hostname) at $(date)"
+echo "Starting training run on $(hostname) at $(date)"
 echo "Using configuration: ${CONFIG_FILE}"
 
 srun --container-image="nvcr.io/nvidia/pytorch:25.12-py3" \
