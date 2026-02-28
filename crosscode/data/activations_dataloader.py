@@ -85,7 +85,7 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
 
             def example_iterator_MPD() -> Iterator[torch.Tensor]:
                 for hbatch_HsMPD in iterator_HsMPD:
-                    yield from hbatch_HsMPD.unbind(dim=0)
+                    yield from (t.clone() for t in hbatch_HsMPD.unbind(dim=0))
 
             batch_iter_BMPD = batch_shuffle_tensor_iterator_BX(
                 tensor_iterator_X=example_iterator_MPD(),
