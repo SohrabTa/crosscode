@@ -21,7 +21,7 @@ train:
   dead_latents_threshold_n_examples: 5_000_000
   k_aux: 512 # heuristic model_dim / 2
   lambda_aux: 0.03125 # 1/32
-experiment_name: "crosscoder_l8192_k32"
+experiment_name: "crosscoder_l8192_k32_bs512_full"
 wandb:
   entity: "sohrab-train"
   project: "crosscoders-protT5"
