@@ -1,9 +1,11 @@
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 from einops import pack
 from transformer_lens import HookedTransformer  # type: ignore
+from transformers import T5EncoderModel  # type: ignore
 
 from crosscode.data.activation_cache import ActivationsCache
 from crosscode.log import logger
@@ -17,18 +19,140 @@ from crosscode.log import logger
 CacheMode = Literal["no_cache", "cache"]  # , "cache_with_mmap"] # TODO validate mmap works, not confient atm
 
 
+class HarvestingStrategy(ABC):
+    """Strategy for architecture-specific harvesting logic."""
+
+    @abstractmethod
+    def get_device(self, llm: torch.nn.Module) -> torch.device: ...
+
+    @abstractmethod
+    def run_with_cache(
+        self,
+        llm: torch.nn.Module,
+        sequence_HS: torch.Tensor,
+        hookpoints: list[str],
+        device: torch.device,
+        layer_to_stop_at: int | None,
+    ) -> dict[str, torch.Tensor]: ...
+
+    @abstractmethod
+    def get_layer_index(self, hookpoint: str) -> int: ...
+
+
+class TransformerStrategy(HarvestingStrategy):
+    """Strategy for HookedTransformer (Decoder-only models)."""
+
+    def get_device(self, llm: HookedTransformer) -> torch.device:
+        return llm.W_E.device
+
+    def run_with_cache(
+        self,
+        llm: HookedTransformer,
+        sequence_HS: torch.Tensor,
+        hookpoints: list[str],
+        device: torch.device,
+        layer_to_stop_at: int | None,
+    ) -> dict[str, torch.Tensor]:
+        _, cache = llm.run_with_cache(
+            sequence_HS.to(device),
+            names_filter=lambda name: name in hookpoints,
+            stop_at_layer=layer_to_stop_at,
+        )
+        return cache
+
+    def get_layer_index(self, hookpoint: str) -> int:
+        return _get_layer(hookpoint)
+
+
+class ProtT5Strategy(HarvestingStrategy):
+    """Strategy for T5 models (e.g., ProtT5 xl)."""
+
+    def get_device(self, llm: torch.nn.Module) -> torch.device:
+        if hasattr(llm, "device"):
+            return llm.device
+        return next(llm.parameters()).device
+
+    def run_with_cache(
+        self,
+        llm: torch.nn.Module,
+        sequence_HS: torch.Tensor,
+        hookpoints: list[str],
+        device: torch.device,
+        layer_to_stop_at: int | None,
+    ) -> dict[str, torch.Tensor]:
+        # If it's an EncoderDecoder model, we harvest from the encoder
+        model_to_run = llm.encoder if hasattr(llm, "encoder") else llm
+
+        cache: dict[str, torch.Tensor] = {}
+        hooks = []
+
+        def get_hook(name: str):
+            def hook(module: torch.nn.Module, input: Any, output: Any):
+                # T5 blocks return a tuple (hidden_states, [attention_outputs])
+                if isinstance(output, tuple):
+                    cache[name] = output[0].detach()
+                else:
+                    cache[name] = output.detach()
+
+            return hook
+
+        for hookpoint in hookpoints:
+            layer_idx = self.get_layer_index(hookpoint)
+            # Support for "encoder.blocks.N.hook_resid_post" (1-indexed in config)
+            # or "encoder.final_layer_norm" for post-norm
+            if "blocks" in hookpoint:
+                target_module = model_to_run.block[layer_idx - 1]
+            elif "final_layer_norm" in hookpoint:
+                target_module = model_to_run.final_layer_norm
+            else:
+                raise ValueError(f"Unsupported hookpoint for ProtT5: {hookpoint}")
+
+            hooks.append(target_module.register_forward_hook(get_hook(hookpoint)))
+
+        attention_mask = (sequence_HS != 0).long().to(device)
+        try:
+            with torch.no_grad():
+                model_to_run(
+                    input_ids=sequence_HS.to(device),
+                    attention_mask=attention_mask,
+                )
+        finally:
+            for h in hooks:
+                h.remove()
+
+        return cache
+
+    def get_layer_index(self, hookpoint: str) -> int:
+        if "final_layer_norm" in hookpoint:
+            return 999  # Special index for final layer norm if needed
+        return _get_layer(hookpoint)
+
+
 class ActivationsHarvester:
     def __init__(
         self,
-        llms: list[HookedTransformer],
+        llms: list[HookedTransformer | T5EncoderModel],
         hookpoints: list[str],
         activations_cache_dir: Path | None = None,
         cache_mode: CacheMode = "no_cache",
     ):
-        if len({llm.cfg.d_model for llm in llms}) != 1:
+        def get_d_model(llm):
+            if hasattr(llm, "cfg"):
+                return llm.cfg.d_model
+            return llm.config.d_model
+
+        if len({get_d_model(llm) for llm in llms}) != 1:
             raise ValueError("All models must have the same d_model")
         self._llms = llms
-        self._device = llms[0].W_E.device
+
+        # Select strategy based on the first model
+        first_llm = llms[0]
+        if isinstance(first_llm, T5EncoderModel) or "T5" in first_llm.__class__.__name__:
+            self._strategy = ProtT5Strategy()
+        else:
+            self._strategy = TransformerStrategy()
+
+        self._device = self._strategy.get_device(first_llm)
         self._hookpoints = hookpoints
 
         # Set up the activations cache
@@ -45,25 +169,24 @@ class ActivationsHarvester:
         self._layer_to_stop_at = self._get_layer_to_stop_at()
 
     def _get_layer_to_stop_at(self) -> int:
-        last_needed_layer = max(_get_layer(name) for name in self._hookpoints)
+        last_needed_layer = max(self._strategy.get_layer_index(name) for name in self._hookpoints)
         layer_to_stop_at = last_needed_layer + 1
         logger.info(f"computed last needed layer: {last_needed_layer}, stopping at {layer_to_stop_at}")
         return layer_to_stop_at
 
-    def _get_acts_HSPD(self, llm: HookedTransformer, sequence_HS: torch.Tensor) -> torch.Tensor:
+    def _get_acts_HSPD(self, llm: HookedTransformer | T5EncoderModel, sequence_HS: torch.Tensor) -> torch.Tensor:
         if self._activation_cache is not None:
             cache_key = self._activation_cache.get_cache_key(llm, sequence_HS, self._hookpoints)
             activations_HSPD = self._activation_cache.load_activations(cache_key, self._device)
             if activations_HSPD is not None:
                 return activations_HSPD
 
-        acts_HSD = []  # each element is (harvest_batch_size, sequence_length, n_hookpoints)
         with torch.inference_mode():
-            _, cache = llm.run_with_cache(
-                sequence_HS.to(self._device),
-                names_filter=lambda name: name in self._hookpoints,
-                stop_at_layer=self._layer_to_stop_at,
+            cache = self._strategy.run_with_cache(
+                llm, sequence_HS, self._hookpoints, self._device, self._layer_to_stop_at
             )
+
+        acts_HSD = []
         for hookpoint in self._hookpoints:
             acts_HSD.append(cache[hookpoint])
 
@@ -90,9 +213,20 @@ class ActivationsHarvester:
 
 
 def _get_layer(hookpoint: str) -> int:
+    """Extracts the layer index from a hookpoint name.
+
+    Supports formats like:
+    - blocks.1.hook_resid_post
+    - encoder.blocks.1.hook_resid_post
+    - decoder.blocks.1.hook_resid_post
+    """
     if "blocks" not in hookpoint:
         raise NotImplementedError(
             f'Hookpoint "{hookpoint}" is not a blocks hookpoint, cannot determine layer, (but feel free to add this functionality!)'
         )
-    assert hookpoint.startswith("blocks.")
-    return int(hookpoint.split(".")[1])
+    parts = hookpoint.split(".")
+    try:
+        blocks_idx = parts.index("blocks")
+        return int(parts[blocks_idx + 1])
+    except (ValueError, IndexError):
+        raise ValueError(f"Could not determine layer index from hookpoint: {hookpoint}") from None

@@ -1,9 +1,11 @@
-import fire  # type: ignore
+import fire
+import torch
+from transformers import T5EncoderModel
 
 from crosscode.data.activations_dataloader import build_model_hookpoint_dataloader
 from crosscode.llms import build_llms
 from crosscode.log import logger
-from crosscode.models import AnthropicTransposeInit, ModelHookpointAcausalCrosscoder, TopkActivation
+from crosscode.models import AnthropicTransposeInit, DataPointInit, ModelHookpointAcausalCrosscoder, TopkActivation
 from crosscode.models.activations.topk import BatchTopkActivation, GroupMaxActivation
 from crosscode.trainers.base_trainer import run_exp
 from crosscode.trainers.topk_crosscoder.config import TopKAcausalCrosscoderExperimentConfig
@@ -30,20 +32,7 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         case "groupmax":
             cc_act = GroupMaxActivation(k_groups=cfg.crosscoder.k, latents_size=cfg.crosscoder.n_latents)
 
-    d_model = llms[0].cfg.d_model
-
-    crosscoder = ModelHookpointAcausalCrosscoder(
-        n_models=len(llms),
-        n_hookpoints=len(cfg.hookpoints),
-        d_model=d_model,
-        n_latents=cfg.crosscoder.n_latents,
-        init_strategy=AnthropicTransposeInit(dec_init_norm=cfg.crosscoder.dec_init_norm),
-        activation_fn=cc_act,
-        use_encoder_bias=cfg.crosscoder.use_encoder_bias,
-        use_decoder_bias=cfg.crosscoder.use_decoder_bias,
-    )
-
-    crosscoder = crosscoder.to(device)
+    d_model = llms[0].config.d_model if isinstance(llms[0], T5EncoderModel) else llms[0].cfg.d_model
 
     dataloader = build_model_hookpoint_dataloader(
         cfg=cfg.data,
@@ -52,6 +41,44 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         batch_size=cfg.train.minibatch_size(),
         cache_dir=cfg.cache_dir,
     )
+
+    if cfg.crosscoder.init_strategy == "data_point_init":
+        logger.info("Initializing with DPI")
+        # Gather data points equal to n_latents
+        data_points_list = []
+        n_collected = 0
+        for batch in dataloader:
+            acts = batch.activations_BMPD
+            data_points_list.append(acts)
+            n_collected += acts.shape[0]
+            if n_collected >= cfg.crosscoder.n_latents:
+                break
+
+        all_data_points = torch.cat(data_points_list, dim=0)
+        # Randomly sample exactly n_latents points
+        indices = torch.randperm(all_data_points.shape[0])[: cfg.crosscoder.n_latents]
+        data_points = all_data_points[indices].to(device)
+
+        init_strategy = DataPointInit(
+            data_points=data_points,
+            datapoint_scale=cfg.crosscoder.datapoint_scale,
+            dec_init_norm=cfg.crosscoder.dec_init_norm,
+        )
+    else:
+        init_strategy = AnthropicTransposeInit(dec_init_norm=cfg.crosscoder.dec_init_norm)
+
+    crosscoder = ModelHookpointAcausalCrosscoder(
+        n_models=len(llms),
+        n_hookpoints=len(cfg.hookpoints),
+        d_model=d_model,
+        n_latents=cfg.crosscoder.n_latents,
+        init_strategy=init_strategy,
+        activation_fn=cc_act,
+        use_encoder_bias=cfg.crosscoder.use_encoder_bias,
+        use_decoder_bias=cfg.crosscoder.use_decoder_bias,
+    )
+
+    crosscoder = crosscoder.to(device)
 
     if cfg.train.k_aux is None:
         cfg.train.k_aux = d_model // 2

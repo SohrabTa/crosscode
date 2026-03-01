@@ -11,6 +11,7 @@ from .activations import (
 )
 from .base_crosscoder import BaseCrosscoder
 from .initialization.anthropic_transpose import AnthropicTransposeInit
+from .initialization.data_point_init import DataPointInit
 from .initialization.init_strategy import InitStrategy
 from .initialization.jan_update_init import DataDependentJumpReLUInitStrategy
 from .sae import SAEOrTranscoder
@@ -26,6 +27,7 @@ __all__ = [
     "AnthropicTransposeInit",
     "BatchTopkActivation",
     "DataDependentJumpReLUInitStrategy",
+    "DataPointInit",
     "InitStrategy",
     "ReLUActivation",
     "TopkActivation",
