@@ -7,7 +7,7 @@ data:
     llms:
       - hf_model_name: Rostlab/prot_t5_xl_uniref50
         base_architecture_name: T5ForConditionalGeneration
-    harvesting_batch_size: 64
+    harvesting_batch_size: 256
     cache_mode: "no_cache"
   activations_shuffle_buffer_size: 400_000
 crosscoder:
