@@ -161,7 +161,8 @@ class ActivationsHarvester:
             if not activations_cache_dir:
                 raise ValueError("cache_mode is enabled but no cache_dir provided; caching will be disabled")
             self._activation_cache = ActivationsCache(
-                cache_dir=activations_cache_dir  # , use_mmap=cache_mode == "cache_with_mmap" # TODO validate mmap works, not confient atm
+                cache_dir=activations_cache_dir  # , use_mmap=cache_mode == "cache_with_mmap"
+                # TODO validate mmap works, not confient atm
             )
 
         self.num_models = len(llms)
@@ -222,7 +223,8 @@ def _get_layer(hookpoint: str) -> int:
     """
     if "blocks" not in hookpoint:
         raise NotImplementedError(
-            f'Hookpoint "{hookpoint}" is not a blocks hookpoint, cannot determine layer, (but feel free to add this functionality!)'
+            f"""Hookpoint "{hookpoint}" is not a blocks hookpoint, cannot determine layer,
+             (but feel free to add this functionality!)"""
         )
     parts = hookpoint.split(".")
     try:

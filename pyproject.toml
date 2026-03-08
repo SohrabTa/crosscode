@@ -24,6 +24,7 @@ dependencies = [
     "schedulefree",
     "zstandard",
     "biopython>=1.86",
+    "interplm",
 ]
 
 [project.optional-dependencies]
@@ -88,3 +89,6 @@ reportUnusedExpression = true
 reportMatchNotExhaustive = true
 reportShadowedImports = true
 reportPrivateImportUsage = false
+
+[tool.uv.sources]
+interplm = { path = "../InterPLM", editable = true }
