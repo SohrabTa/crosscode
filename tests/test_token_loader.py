@@ -33,7 +33,8 @@ def test_huggingface_text_dataset_token_sequence_loader():
         batch_size=1,
     )
 
-    example_tokens = next(token_sequence_loader.get_sequences_batch_iterator())
+    iterator = token_sequence_loader.get_sequences_batch_iterator()
+    example_tokens = next(iterator)
     assert example_tokens.tokens_HS.shape == (1, sequence_length)
     example_text = tokenizer.decode(example_tokens.tokens_HS[0])
     assert example_text == "<|endoftext|>hello world 0<|endoftext|>hello world"
@@ -41,7 +42,7 @@ def test_huggingface_text_dataset_token_sequence_loader():
     assert example_tokens.special_tokens_mask_HS.sum() == 2
     assert torch.all(example_tokens.special_tokens_mask_HS[0] == torch.tensor([1, 0, 0, 0, 1, 0, 0], dtype=torch.bool))
 
-    second_example_tokens = next(token_sequence_loader.get_sequences_batch_iterator())
+    second_example_tokens = next(iterator)
     assert second_example_tokens.tokens_HS.shape == (1, sequence_length)
     second_example_text = tokenizer.decode(second_example_tokens.tokens_HS[0])
     assert second_example_text == " 1<|endoftext|>hello world 2<|endoftext|>hello"
