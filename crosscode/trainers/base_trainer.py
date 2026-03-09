@@ -65,69 +65,83 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
         self.wandb_run.summary["model/params"] = n_params
         self.wandb_run.summary["model/size_mb"] = model_size_mb
 
+    def _save_final_or_crash_model(self, is_crash: bool = False) -> None:
+        status = "crashed" if is_crash else "final"
+        checkpoint_path = self.save_dir / f"{status}_epoch_{self.epoch}_step_{self.step}"
+        if hasattr(self, "activations_dataloader") and hasattr(self.activations_dataloader, "get_scaling_factors"):
+            scaling_factors_MP = self.activations_dataloader.get_scaling_factors().to(self.device)
+            self.model.with_folded_scaling_factors(scaling_factors_MP).save(checkpoint_path)
+            logger.info(f"Saved {status} trained model to {checkpoint_path}")
+        else:
+            self.model.save(checkpoint_path)
+            logger.info(f"Saved {status} trained model to {checkpoint_path}")
+
     def train(self) -> None:
         # scaling_factors_MP = self.activations_dataloader.get_norm_scaling_factors_MP().to(self.device)
         epoch_dataloader = self.activations_dataloader.get_activations_iterator()
 
-        for _ in tqdm(
-            range(self.cfg.num_steps),
-            desc="Train Steps",
-            smoothing=0.15,  # this loop is bursty because of activation harvesting
-        ):
-            step_start_time = time.perf_counter()
-            self._lr_step()
-            self.optimizer.zero_grad()
+        try:
+            for _ in tqdm(
+                range(self.cfg.num_steps),
+                desc="Train Steps",
+                smoothing=0.15,  # this loop is bursty because of activation harvesting
+            ):
+                step_start_time = time.perf_counter()
+                self._lr_step()
+                self.optimizer.zero_grad()
 
-            log_dicts: list[dict[str, float]] = []
-            log = self.step % self.cfg.log_every_n_steps == 0
+                log_dicts: list[dict[str, float]] = []
+                log = self.step % self.cfg.log_every_n_steps == 0
 
-            data_wait_time = 0.0
-            for _ in range(self.cfg.gradient_accumulation_steps_per_batch):
-                data_start_time = time.perf_counter()
-                batch = next(epoch_dataloader)
-                data_wait_time += time.perf_counter() - data_start_time
+                data_wait_time = 0.0
+                for _ in range(self.cfg.gradient_accumulation_steps_per_batch):
+                    data_start_time = time.perf_counter()
+                    batch = next(epoch_dataloader)
+                    data_wait_time += time.perf_counter() - data_start_time
 
-                loss, log_dict, tokens_trained = self.run_batch(batch, log)
-                if self.epoch == 0:
-                    self.unique_tokens_trained += tokens_trained
+                    loss, log_dict, tokens_trained = self.run_batch(batch, log)
+                    if self.epoch == 0:
+                        self.unique_tokens_trained += tokens_trained
 
-                loss.div(self.cfg.gradient_accumulation_steps_per_batch).backward()
-                if log_dict is not None:
-                    log_dicts.append(log_dict)
+                    loss.div(self.cfg.gradient_accumulation_steps_per_batch).backward()
+                    if log_dict is not None:
+                        log_dicts.append(log_dict)
 
-            self._after_forward_passes()
+                self._after_forward_passes()
 
-            step_time = time.perf_counter() - step_start_time
-            if log_dicts:
-                batch_log_dict_avgs = {
-                    **{k: sum(v) / len(v) for k, v in dict_join(log_dicts).items()},
-                    **self._step_logs(),
-                    "perf/data_wait_time": data_wait_time,
-                    "perf/step_time": step_time,
-                    "perf/steps_per_second": 1.0 / step_time if step_time > 0 else 0,
-                    "perf/peak_vram_gb": torch.cuda.max_memory_allocated() / (1024**3)
-                    if torch.cuda.is_available()
-                    else 0,
-                }
-                self.wandb_run.log(batch_log_dict_avgs, step=self.step)
+                step_time = time.perf_counter() - step_start_time
+                if log_dicts:
+                    batch_log_dict_avgs = {
+                        **{k: sum(v) / len(v) for k, v in dict_join(log_dicts).items()},
+                        **self._step_logs(),
+                        "perf/data_wait_time": data_wait_time,
+                        "perf/step_time": step_time,
+                        "perf/steps_per_second": 1.0 / step_time if step_time > 0 else 0,
+                        "perf/peak_vram_gb": torch.cuda.max_memory_allocated() / (1024**3)
+                        if torch.cuda.is_available()
+                        else 0,
+                    }
+                    self.wandb_run.log(batch_log_dict_avgs, step=self.step)
 
-            self._maybe_save_model()
+                self._maybe_save_model()
 
-            clip_grad_norm_(self.model.parameters(), 1.0)
-            self.optimizer.step()
-            self.step += 1
+                clip_grad_norm_(self.model.parameters(), 1.0)
+                self.optimizer.step()
+                self.step += 1
 
-        self.wandb_run.finish()
-
-        # Always save the final model at the end of training
-        final_checkpoint_path = self.save_dir / f"final_epoch_{self.epoch}_step_{self.step}"
-        if hasattr(self, "activations_dataloader") and hasattr(self.activations_dataloader, "get_scaling_factors"):
-            scaling_factors_MP = self.activations_dataloader.get_scaling_factors().to(self.device)
-            self.model.with_folded_scaling_factors(scaling_factors_MP).save(final_checkpoint_path)
-            logger.info(f"Saved final trained model to {final_checkpoint_path}")
+        except Exception as e:
+            logger.error(f"Training crashed at step {self.step}. Saving checkpoint...")
+            self._save_final_or_crash_model(is_crash=True)
+            self.wandb_run.finish()
+            raise e
+        except KeyboardInterrupt as e:
+            logger.info(f"Training interrupted at step {self.step}. Saving checkpoint...")
+            self._save_final_or_crash_model(is_crash=True)
+            self.wandb_run.finish()
+            raise e
         else:
-            self.model.save(final_checkpoint_path)
-            logger.info(f"Saved final trained model to {final_checkpoint_path}")
+            self._save_final_or_crash_model(is_crash=False)
+            self.wandb_run.finish()
 
 
     def _after_forward_passes(self): ...
