@@ -1,211 +1,0 @@
-pyxis: importing docker image: nvcr.io/nvidia/pytorch:25.12-py3
-pyxis: imported docker image: nvcr.io/nvidia/pytorch:25.12-py3
-wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-2026-02-25 20:31:58 - INFO - Starting...
-2026-02-25 20:31:58 - INFO - Loading config...
-2026-02-25 20:31:58 - INFO - Loaded config (raw):
-{'data': {'token_sequence_loader': {'type': 'fasta', 'fasta_path': '/workspace/data/dataset/uniref50_3M_length_512.fasta', 'max_sequence_length': 512}, 'activations_harvester': {'llms': [{'hf_model_name': 'Rostlab/prot_t5_xl_uniref50', 'base_architecture_name': 'T5ForConditionalGeneration'}], 'harvesting_batch_size': 128, 'cache_mode': 'no_cache'}, 'activations_shuffle_buffer_size': 400000}, 'crosscoder': {'n_latents': 8192, 'k': 32}, 'train': {'batch_size': 256, 'num_steps': 100, 'save_every_n_steps': 50, 'log_every_n_steps': 10, 'topk_style': 'batch_topk', 'dead_latents_threshold_n_examples': 5000000, 'k_aux': 512, 'lambda_aux': 0.03125}, 'experiment_name': 'profiling_final_8192', 'wandb': {'entity': 'sohrab-train', 'project': 'crosscoders-protT5'}, 'base_save_dir': '/workspace/data/checkpoints', 'cache_dir': '/workspace/data/hf_home/', 'hookpoints': ['encoder.blocks.1.hook_resid_post', 'encoder.blocks.2.hook_resid_post', 'encoder.blocks.3.hook_resid_post', 'encoder.blocks.4.hook_resid_post', 'encoder.blocks.5.hook_resid_post', 'encoder.blocks.6.hook_resid_post', 'encoder.blocks.7.hook_resid_post', 'encoder.blocks.8.hook_resid_post', 'encoder.blocks.9.hook_resid_post', 'encoder.blocks.10.hook_resid_post', 'encoder.blocks.11.hook_resid_post', 'encoder.blocks.12.hook_resid_post', 'encoder.blocks.13.hook_resid_post', 'encoder.blocks.14.hook_resid_post', 'encoder.blocks.15.hook_resid_post', 'encoder.blocks.16.hook_resid_post', 'encoder.blocks.17.hook_resid_post', 'encoder.blocks.18.hook_resid_post', 'encoder.blocks.19.hook_resid_post', 'encoder.blocks.20.hook_resid_post', 'encoder.blocks.21.hook_resid_post', 'encoder.blocks.22.hook_resid_post', 'encoder.blocks.23.hook_resid_post', 'encoder.blocks.24.hook_resid_post']}
-2026-02-25 20:31:58 - INFO - Loaded config (parsed):
-{
-  "seed": 42,
-  "cache_dir": "/workspace/data/hf_home/",
-  "base_save_dir": "/workspace/data/checkpoints",
-  "wandb": {
-    "entity": "sohrab-train",
-    "project": "crosscoders-protT5",
-    "mode": "online"
-  },
-  "experiment_name": "profiling_final_8192",
-  "data": {
-    "token_sequence_loader": {
-      "type": "fasta",
-      "fasta_path": "/workspace/data/dataset/uniref50_3M_length_512.fasta",
-      "max_sequence_length": 512,
-      "sequences_shuffle_buffer_size": null
-    },
-    "activations_harvester": {
-      "llms": [
-        {
-          "name": null,
-          "revision": null,
-          "base_architecture_name": "T5ForConditionalGeneration",
-          "hf_model_name": "Rostlab/prot_t5_xl_uniref50"
-        }
-      ],
-      "inference_dtype": "float32",
-      "harvesting_batch_size": 128,
-      "cache_mode": "no_cache"
-    },
-    "n_tokens_for_norm_estimate": 100000,
-    "activations_shuffle_buffer_size": 400000
-  },
-  "crosscoder": {
-    "n_latents": 8192,
-    "use_encoder_bias": true,
-    "use_decoder_bias": true,
-    "init_strategy": "anthropic_transpose",
-    "datapoint_scale": 0.4,
-    "dec_init_norm": 0.1,
-    "k": 32
-  },
-  "train": {
-    "batch_size": 256,
-    "optimizer": {
-      "type": "adam",
-      "warmup_pct": 0.05,
-      "learning_rate": 0.00005,
-      "warmdown_pct": 0.2,
-      "betas": [
-        0.0,
-        0.999
-      ]
-    },
-    "num_steps": 100,
-    "save_every_n_steps": 50,
-    "upload_saves_to_wandb": false,
-    "log_every_n_steps": 10,
-    "gradient_accumulation_steps_per_batch": 1,
-    "topk_style": "batch_topk",
-    "dead_latents_threshold_n_examples": 5000000,
-    "lambda_aux": 0.03125,
-    "k_aux": 512
-  },
-  "hookpoints": [
-    "encoder.blocks.1.hook_resid_post",
-    "encoder.blocks.2.hook_resid_post",
-    "encoder.blocks.3.hook_resid_post",
-    "encoder.blocks.4.hook_resid_post",
-    "encoder.blocks.5.hook_resid_post",
-    "encoder.blocks.6.hook_resid_post",
-    "encoder.blocks.7.hook_resid_post",
-    "encoder.blocks.8.hook_resid_post",
-    "encoder.blocks.9.hook_resid_post",
-    "encoder.blocks.10.hook_resid_post",
-    "encoder.blocks.11.hook_resid_post",
-    "encoder.blocks.12.hook_resid_post",
-    "encoder.blocks.13.hook_resid_post",
-    "encoder.blocks.14.hook_resid_post",
-    "encoder.blocks.15.hook_resid_post",
-    "encoder.blocks.16.hook_resid_post",
-    "encoder.blocks.17.hook_resid_post",
-    "encoder.blocks.18.hook_resid_post",
-    "encoder.blocks.19.hook_resid_post",
-    "encoder.blocks.20.hook_resid_post",
-    "encoder.blocks.21.hook_resid_post",
-    "encoder.blocks.22.hook_resid_post",
-    "encoder.blocks.23.hook_resid_post",
-    "encoder.blocks.24.hook_resid_post"
-  ]
-}
-2026-02-25 20:31:58 - INFO - over-wrote experiment_name: profiling_final_8192_2026-02-25_20-31-58
-2026-02-25 20:31:58 - INFO - saving in save_dir: /workspace/data/checkpoints/profiling_final_8192_2026-02-25_20-31-58
-2026-02-25 20:31:58 - INFO - Saved config to /workspace/data/checkpoints/profiling_final_8192_2026-02-25_20-31-58/experiment_config.yaml
-2026-02-25 20:31:58 - INFO - Building trainer
-2026-02-25 20:31:59 - INFO - Loading HuggingFace model Rostlab/prot_t5_xl_uniref50 into T5EncoderModel
-You are using the default legacy behaviour of the <class 'transformers.models.t5.tokenization_t5.T5Tokenizer'>. This is expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you. If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it means, and thoroughly read the reason why this was added as explained in https://github.com/huggingface/transformers/pull/24565
-2026-02-25 20:32:22 - INFO - Assigned model key: tl-T5ForConditionalGeneration_hf-Rostlab_prot_t5_xl_uniref50
-2026-02-25 20:32:23 - INFO - computed last needed layer: 24, stopping at 25
-refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s]refilling buffer:   0%|          | 1/400000 [00:01<192:57:59,  1.74s/it]refilling buffer:  16%|█▋        | 65237/400000 [00:03<00:14, 23870.17it/s]refilling buffer:  33%|███▎      | 130467/400000 [00:04<00:08, 32232.15it/s]refilling buffer:  49%|████▉     | 195695/400000 [00:06<00:05, 36276.83it/s]refilling buffer:  65%|██████▌   | 260933/400000 [00:07<00:03, 38529.74it/s]refilling buffer:  82%|████████▏ | 326166/400000 [00:09<00:01, 39894.20it/s]refilling buffer:  98%|█████████▊| 391418/400000 [00:10<00:00, 40765.31it/s]refilling buffer: 100%|██████████| 400000/400000 [00:10<00:00, 36661.61it/s]
-Estimating norm scaling factor:   0%|          | 0/391 [00:00<?, ?it/s]Estimating norm scaling factor:   0%|          | 1/391 [00:00<03:15,  2.00it/s]Estimating norm scaling factor:  61%|██████▏   | 240/391 [00:00<00:00, 532.51it/s]Estimating norm scaling factor: 100%|██████████| 391/391 [00:00<00:00, 594.36it/s]
-wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
-wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-wandb: creating run
-wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in /workspace/crosscode/wandb/run-20260225_203240-ksz0c4oh
-wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run profiling_final_8192_2026-02-25_20-31-58
-wandb: ⭐️ View project at https://wandb.ai/sohrab-train/crosscoders-protT5
-wandb: 🚀 View run at https://wandb.ai/sohrab-train/crosscoders-protT5/runs/ksz0c4oh
-2026-02-25 20:32:44 - INFO - Model size: 402,685,952 parameters (1536.12 MB)
-2026-02-25 20:32:44 - INFO - Training
-Train Steps:   0%|          | 0/100 [00:00<?, ?it/s]
-refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s][A
-refilling buffer:   0%|          | 1/400000 [00:01<168:29:27,  1.52s/it][A
-refilling buffer:  16%|█▋        | 65257/400000 [00:03<00:13, 25277.09it/s][A
-refilling buffer:  33%|███▎      | 130515/400000 [00:04<00:08, 33270.24it/s][A
-refilling buffer:  49%|████▉     | 195770/400000 [00:06<00:05, 36994.70it/s][A
-refilling buffer:  65%|██████▌   | 261030/400000 [00:07<00:03, 39019.82it/s][A
-refilling buffer:  82%|████████▏ | 326290/400000 [00:09<00:01, 40241.20it/s][A
-refilling buffer:  98%|█████████▊| 391569/400000 [00:10<00:00, 40989.25it/s][Arefilling buffer: 100%|██████████| 400000/400000 [00:10<00:00, 37390.27it/s]
-Train Steps:   1%|          | 1/100 [00:16<27:01, 16.38s/it]Train Steps:   6%|▌         | 6/100 [00:16<03:45,  2.40s/it]Train Steps:  11%|█         | 11/100 [00:16<01:47,  1.21s/it]Train Steps:  16%|█▌        | 16/100 [00:16<01:04,  1.30it/s]Train Steps:  21%|██        | 21/100 [00:16<00:42,  1.85it/s]Train Steps:  26%|██▌       | 26/100 [00:16<00:29,  2.47it/s]Train Steps:  31%|███       | 31/100 [00:17<00:21,  3.19it/s]Train Steps:  36%|███▌      | 36/100 [00:17<00:16,  4.00it/s]Train Steps:  41%|████      | 41/100 [00:17<00:12,  4.91it/s]Train Steps:  46%|████▌     | 46/100 [00:17<00:09,  5.93it/s]Train Steps:  51%|█████     | 51/100 [00:20<00:12,  3.81it/s]Train Steps:  56%|█████▌    | 56/100 [00:20<00:09,  4.57it/s]Train Steps:  61%|██████    | 61/100 [00:20<00:07,  5.41it/s]Train Steps:  66%|██████▌   | 66/100 [00:21<00:05,  6.37it/s]Train Steps:  71%|███████   | 71/100 [00:21<00:03,  7.44it/s]Train Steps:  76%|███████▌  | 76/100 [00:21<00:02,  8.63it/s]Train Steps:  81%|████████  | 81/100 [00:21<00:01,  9.93it/s]Train Steps:  86%|████████▌ | 86/100 [00:21<00:01, 11.36it/s]Train Steps:  91%|█████████ | 91/100 [00:21<00:00, 12.89it/s]Train Steps:  96%|█████████▌| 96/100 [00:21<00:00, 14.55it/s]Train Steps: 100%|██████████| 100/100 [00:21<00:00,  4.59it/s]
-wandb: uploading config.yaml
-wandb:                                                                                
-wandb: 
-wandb: Run history:
-wandb:                                         perf/data_wait_time █▁▁▁▁▁▁▁▁▁
-wandb:                                           perf/peak_vram_gb ▁▁▁▁▁▁▁▁▁▁
-wandb:                                              perf/step_time █▁▁▁▁▁▁▁▁▁
-wandb:                                       perf/steps_per_second ▁█████████
-wandb:                                              train/aux_loss ▁▁▁▁▁▁▁▁▁▁
-wandb:                                                 train/epoch ▁▁▁▁▁▁▁▁▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.1.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb: train/fvu/model0/hookpointencoder.blocks.10.hook_resid_post ██▆▆▆▅▃▃▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.11.hook_resid_post ▇█▆▇▆▅▃▃▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.12.hook_resid_post ██▆▇▆▅▄▃▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.13.hook_resid_post ██▇▇▆▅▃▃▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.14.hook_resid_post ██▇▇▆▅▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.15.hook_resid_post ██▇▇▆▅▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.16.hook_resid_post ██▇▆▆▄▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.17.hook_resid_post ██▇▆▆▄▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.18.hook_resid_post ██▇▆▅▄▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.19.hook_resid_post ██▇▆▅▄▃▂▂▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.2.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb: train/fvu/model0/hookpointencoder.blocks.20.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb: train/fvu/model0/hookpointencoder.blocks.21.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb: train/fvu/model0/hookpointencoder.blocks.22.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb: train/fvu/model0/hookpointencoder.blocks.23.hook_resid_post ██▇▆▅▄▃▂▂▁
-wandb: train/fvu/model0/hookpointencoder.blocks.24.hook_resid_post ██▇▆▅▄▃▂▂▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.3.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.4.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.5.hook_resid_post █▇▇▆▅▄▃▂▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.6.hook_resid_post █▇▇▆▅▄▃▂▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.7.hook_resid_post ██▇▆▅▄▃▂▁▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.8.hook_resid_post ██▇▆▅▄▃▂▂▁
-wandb:  train/fvu/model0/hookpointencoder.blocks.9.hook_resid_post ██▇▆▅▄▃▃▂▁
-wandb:                                         train/learning_rate ▁████████▅
-wandb:                                                  train/loss ██▇▆▄▄▃▂▁▁
-wandb:                                   train/reconstruction_loss ██▇▆▄▄▃▂▁▁
-wandb:                                 train/unique_tokens_trained ▁▂▃▃▄▅▆▆▇█
-wandb: 
-wandb: Run summary:
-wandb:                                                model/params 402685952
-wandb:                                               model/size_mb 1536.125
-wandb:                                         perf/data_wait_time 0.00078
-wandb:                                           perf/peak_vram_gb 71.13246
-wandb:                                              perf/step_time 0.02101
-wandb:                                       perf/steps_per_second 47.6066
-wandb:                                              train/aux_loss 0
-wandb:                                                 train/epoch 0
-wandb:  train/fvu/model0/hookpointencoder.blocks.1.hook_resid_post 1.18761
-wandb: train/fvu/model0/hookpointencoder.blocks.10.hook_resid_post 1.43793
-wandb: train/fvu/model0/hookpointencoder.blocks.11.hook_resid_post 1.42221
-wandb: train/fvu/model0/hookpointencoder.blocks.12.hook_resid_post 1.49882
-wandb: train/fvu/model0/hookpointencoder.blocks.13.hook_resid_post 1.4774
-wandb: train/fvu/model0/hookpointencoder.blocks.14.hook_resid_post 1.42376
-wandb: train/fvu/model0/hookpointencoder.blocks.15.hook_resid_post 1.40179
-wandb: train/fvu/model0/hookpointencoder.blocks.16.hook_resid_post 1.35274
-wandb: train/fvu/model0/hookpointencoder.blocks.17.hook_resid_post 1.36206
-wandb: train/fvu/model0/hookpointencoder.blocks.18.hook_resid_post 1.31379
-wandb: train/fvu/model0/hookpointencoder.blocks.19.hook_resid_post 1.26457
-wandb:  train/fvu/model0/hookpointencoder.blocks.2.hook_resid_post 1.10973
-wandb: train/fvu/model0/hookpointencoder.blocks.20.hook_resid_post 1.17929
-wandb: train/fvu/model0/hookpointencoder.blocks.21.hook_resid_post 1.15658
-wandb: train/fvu/model0/hookpointencoder.blocks.22.hook_resid_post 1.11945
-wandb: train/fvu/model0/hookpointencoder.blocks.23.hook_resid_post 1.14827
-wandb: train/fvu/model0/hookpointencoder.blocks.24.hook_resid_post 1.21854
-wandb:  train/fvu/model0/hookpointencoder.blocks.3.hook_resid_post 1.05405
-wandb:  train/fvu/model0/hookpointencoder.blocks.4.hook_resid_post 1.02451
-wandb:  train/fvu/model0/hookpointencoder.blocks.5.hook_resid_post 1.04291
-wandb:  train/fvu/model0/hookpointencoder.blocks.6.hook_resid_post 1.04537
-wandb:  train/fvu/model0/hookpointencoder.blocks.7.hook_resid_post 1.02187
-wandb:  train/fvu/model0/hookpointencoder.blocks.8.hook_resid_post 1.05164
-wandb:  train/fvu/model0/hookpointencoder.blocks.9.hook_resid_post 1.22692
-wandb:                                         train/learning_rate 2e-05
-wandb:                                                  train/loss 12462.69238
-wandb:                                   train/reconstruction_loss 12462.69238
-wandb:                                 train/unique_tokens_trained 23296
-wandb: 
-wandb: 🚀 View run profiling_final_8192_2026-02-25_20-31-58 at: https://wandb.ai/sohrab-train/crosscoders-protT5/runs/ksz0c4oh
-wandb: ⭐️ View project at: https://wandb.ai/sohrab-train/crosscoders-protT5
-wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
-wandb: Find logs at: ./wandb/run-20260225_203240-ksz0c4oh/logs
