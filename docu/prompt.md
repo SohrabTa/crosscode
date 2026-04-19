@@ -72,11 +72,17 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 4. **Profiling & Instrumentation:** Instrumented `BaseTrainer` to log VRAM (peak ~24GB), throughput (~48 steps/s), and data wait time (~0ms). Found parameters that allow a full training run to complete in ~20 hours.
 5. **Training Run**: Successfully ran a training run on an `lrz-hgx-h100-94x4` node with the following [Training Run Config](#training-run-config).
 6. **InterPLM Integration:** Integrated Crosscoder models with InterPLM by adding adapter classes (`CrosscoderDictionaryWrapper`), utility scripts (`run_feature_collection.py`, `run_normalization.py`), and updating dependencies.
-7. **Eval Dataset Creation:** Created the evaluation dataset for the InterPLM pipeline ensuring reproducibility with the following parameters:
+7. **Eval Dataset Creation:** Created evaluation datasets for the InterPLM pipeline ensuring reproducibility with the following parameters:
 
-* `extract_annotations.py`: `--input_uniprot_path /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/proteins.tsv.gz --output_dir /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/processed_annotations --n_shards 8`
-* `prepare_eval_set.py`: `--valid_shard_range 0 3 --test_shard_range 4 7 --uniprot_dir /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/processed_annotations`
-* this filtered from 250 concepts to 141 concepts with at least 1,500 amino acids or 25 domains
+   * **5k Dataset:**
+     * `extract_annotations.py`: `--input_uniprot_path /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/proteins.tsv.gz --output_dir /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/processed_annotations --n_shards 8`
+     * `prepare_eval_set.py`: `--valid_shard_range 0 3 --test_shard_range 4 7 --uniprot_dir /Users/sohrab.tawana/private/repos/sparse-crosscoders-prott5/data/uniprotkb_modern_score5_5k/processed_annotations`
+     * Result: Filtered from 250 concepts to 141 concepts with at least 1,500 amino acids or 25 domains.
+
+   * **35k Dataset:**
+     * `extract_annotations.py`: `--input_uniprot_path /Users/sohrab.tawana/private/data/uniprotkb_modern_score5_35k/proteins.tsv.gz --output_dir /Users/sohrab.tawana/private/data/uniprotkb_modern_score5_35k/processed_annotations --n_shards 42`
+     * `prepare_eval_set.py`: `--valid_shard_range 0 20 --test_shard_range 21 41 --uniprot_dir /Users/sohrab.tawana/private/data/uniprotkb_modern_score5_35k/processed_annotations`
+     * Result: Filtered from 250 concepts to 141 concepts with at least 1,500 amino acids or 25 domains.
 
 8. **Embedding Generation:** Ran `InterPLM/submit.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
 
