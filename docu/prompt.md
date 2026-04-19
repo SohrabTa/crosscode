@@ -80,7 +80,13 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 
 8. **Embedding Generation:** Ran `InterPLM/submit.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
 
-9. **Crosscoder Feature Normalization:** Ran `InterPLM/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize the crosscoder feature activation values between 0 and 1 using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+9. **Crosscoder Feature Normalization:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize the crosscoder feature activation values between 0 and 1 using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+
+10. **InterPLM Evaluation Pipeline:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node. This script ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
+
+11. **Feature Activation Collection:** Ran `InterPLM/scripts/submit_collect.sh` containing `InterPLM/scripts/collect_feature_activations.py` on an `lrz-hgx-h100-94x4` node. This identified the top activating protein sequences and computed statistics for the features in the crosscoder checkpoint.
+
+12. **Dashboard Cache Generation:** Ran `InterPLM/scripts/submit_create_dashboard.sh` containing `InterPLM/scripts/create_dashboard.py` on an `lrz-hgx-h100-94x4` node. This generated the data cache required for interactive visualization in the InterPLM dashboard, integrating the crosscoder features with their biological concepts.
 
 ## Training Run Config
 
