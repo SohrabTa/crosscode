@@ -147,8 +147,7 @@ class TokenSequenceLoader:
             yield_final_batch=True,
         )
 
-    @cached_property
-    def _get_sequences_batch_iterator(self) -> Iterator[TokensSequenceBatch]:
+    def get_sequences_batch_iterator(self) -> Iterator[TokensSequenceBatch]:
         # we shuffle this iterator (only between, not within, sequences) so that we don't have to worry
         # about long documents introducing high feature correlations
         # this shuffler returns batches of sequences of tokens.
@@ -176,6 +175,3 @@ class TokenSequenceLoader:
                     )
                     out_tokens_S.clear()
                 out_tokens_S.append(sample_S)
-
-    def get_sequences_batch_iterator(self) -> Iterator[TokensSequenceBatch]:
-        return self._get_sequences_batch_iterator

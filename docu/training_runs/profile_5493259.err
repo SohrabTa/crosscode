@@ -1,0 +1,234 @@
+pyxis: importing docker image: nvcr.io/nvidia/pytorch:25.12-py3
+pyxis: imported docker image: nvcr.io/nvidia/pytorch:25.12-py3
+wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+2026-02-26 22:36:34 - INFO - Starting...
+2026-02-26 22:36:34 - INFO - Loading config...
+2026-02-26 22:36:34 - INFO - Loaded config (raw):
+{'data': {'token_sequence_loader': {'type': 'fasta', 'fasta_path': '/workspace/data/dataset/uniref50_3M_length_512.fasta', 'max_sequence_length': 512}, 'activations_harvester': {'llms': [{'hf_model_name': 'Rostlab/prot_t5_xl_uniref50', 'base_architecture_name': 'T5ForConditionalGeneration'}], 'harvesting_batch_size': 64, 'cache_mode': 'no_cache'}, 'activations_shuffle_buffer_size': 400000}, 'crosscoder': {'n_latents': 8192, 'k': 32}, 'train': {'batch_size': 256, 'num_steps': 11719, 'log_every_n_steps': 10, 'topk_style': 'batch_topk', 'dead_latents_threshold_n_examples': 5000000, 'k_aux': 512, 'lambda_aux': 0.03125}, 'experiment_name': 'crosscoder_l8192_k32', 'wandb': {'entity': 'sohrab-train', 'project': 'crosscoders-protT5'}, 'base_save_dir': '/workspace/data/checkpoints', 'cache_dir': '/workspace/data/hf_home/', 'hookpoints': ['encoder.blocks.1.hook_resid_post', 'encoder.blocks.2.hook_resid_post', 'encoder.blocks.3.hook_resid_post', 'encoder.blocks.4.hook_resid_post', 'encoder.blocks.5.hook_resid_post', 'encoder.blocks.6.hook_resid_post', 'encoder.blocks.7.hook_resid_post', 'encoder.blocks.8.hook_resid_post', 'encoder.blocks.9.hook_resid_post', 'encoder.blocks.10.hook_resid_post', 'encoder.blocks.11.hook_resid_post', 'encoder.blocks.12.hook_resid_post', 'encoder.blocks.13.hook_resid_post', 'encoder.blocks.14.hook_resid_post', 'encoder.blocks.15.hook_resid_post', 'encoder.blocks.16.hook_resid_post', 'encoder.blocks.17.hook_resid_post', 'encoder.blocks.18.hook_resid_post', 'encoder.blocks.19.hook_resid_post', 'encoder.blocks.20.hook_resid_post', 'encoder.blocks.21.hook_resid_post', 'encoder.blocks.22.hook_resid_post', 'encoder.blocks.23.hook_resid_post', 'encoder.blocks.24.hook_resid_post']}
+2026-02-26 22:36:34 - INFO - Loaded config (parsed):
+{
+  "seed": 42,
+  "cache_dir": "/workspace/data/hf_home/",
+  "base_save_dir": "/workspace/data/checkpoints",
+  "wandb": {
+    "entity": "sohrab-train",
+    "project": "crosscoders-protT5",
+    "mode": "online"
+  },
+  "experiment_name": "crosscoder_l8192_k32",
+  "data": {
+    "token_sequence_loader": {
+      "type": "fasta",
+      "fasta_path": "/workspace/data/dataset/uniref50_3M_length_512.fasta",
+      "max_sequence_length": 512,
+      "sequences_shuffle_buffer_size": null
+    },
+    "activations_harvester": {
+      "llms": [
+        {
+          "name": null,
+          "revision": null,
+          "base_architecture_name": "T5ForConditionalGeneration",
+          "hf_model_name": "Rostlab/prot_t5_xl_uniref50"
+        }
+      ],
+      "inference_dtype": "float32",
+      "harvesting_batch_size": 64,
+      "cache_mode": "no_cache"
+    },
+    "n_tokens_for_norm_estimate": 100000,
+    "activations_shuffle_buffer_size": 400000
+  },
+  "crosscoder": {
+    "n_latents": 8192,
+    "use_encoder_bias": true,
+    "use_decoder_bias": true,
+    "init_strategy": "anthropic_transpose",
+    "datapoint_scale": 0.4,
+    "dec_init_norm": 0.1,
+    "k": 32
+  },
+  "train": {
+    "batch_size": 256,
+    "optimizer": {
+      "type": "adam",
+      "warmup_pct": 0.05,
+      "learning_rate": 0.00005,
+      "warmdown_pct": 0.2,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    },
+    "num_steps": 11719,
+    "save_every_n_steps": null,
+    "upload_saves_to_wandb": false,
+    "log_every_n_steps": 10,
+    "gradient_accumulation_steps_per_batch": 1,
+    "topk_style": "batch_topk",
+    "dead_latents_threshold_n_examples": 5000000,
+    "lambda_aux": 0.03125,
+    "k_aux": 512
+  },
+  "hookpoints": [
+    "encoder.blocks.1.hook_resid_post",
+    "encoder.blocks.2.hook_resid_post",
+    "encoder.blocks.3.hook_resid_post",
+    "encoder.blocks.4.hook_resid_post",
+    "encoder.blocks.5.hook_resid_post",
+    "encoder.blocks.6.hook_resid_post",
+    "encoder.blocks.7.hook_resid_post",
+    "encoder.blocks.8.hook_resid_post",
+    "encoder.blocks.9.hook_resid_post",
+    "encoder.blocks.10.hook_resid_post",
+    "encoder.blocks.11.hook_resid_post",
+    "encoder.blocks.12.hook_resid_post",
+    "encoder.blocks.13.hook_resid_post",
+    "encoder.blocks.14.hook_resid_post",
+    "encoder.blocks.15.hook_resid_post",
+    "encoder.blocks.16.hook_resid_post",
+    "encoder.blocks.17.hook_resid_post",
+    "encoder.blocks.18.hook_resid_post",
+    "encoder.blocks.19.hook_resid_post",
+    "encoder.blocks.20.hook_resid_post",
+    "encoder.blocks.21.hook_resid_post",
+    "encoder.blocks.22.hook_resid_post",
+    "encoder.blocks.23.hook_resid_post",
+    "encoder.blocks.24.hook_resid_post"
+  ]
+}
+2026-02-26 22:36:34 - INFO - over-wrote experiment_name: crosscoder_l8192_k32_2026-02-26_22-36-34
+2026-02-26 22:36:34 - INFO - saving in save_dir: /workspace/data/checkpoints/crosscoder_l8192_k32_2026-02-26_22-36-34
+2026-02-26 22:36:34 - INFO - Saved config to /workspace/data/checkpoints/crosscoder_l8192_k32_2026-02-26_22-36-34/experiment_config.yaml
+2026-02-26 22:36:34 - INFO - Building trainer
+2026-02-26 22:36:35 - INFO - Loading HuggingFace model Rostlab/prot_t5_xl_uniref50 into T5EncoderModel
+You are using the default legacy behaviour of the <class 'transformers.models.t5.tokenization_t5.T5Tokenizer'>. This is expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you. If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it means, and thoroughly read the reason why this was added as explained in https://github.com/huggingface/transformers/pull/24565
+2026-02-26 22:37:13 - INFO - Assigned model key: tl-T5ForConditionalGeneration_hf-Rostlab_prot_t5_xl_uniref50
+2026-02-26 22:37:14 - INFO - computed last needed layer: 24, stopping at 25
+refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s]refilling buffer:   0%|          | 1/400000 [00:03<415:18:47,  3.74s/it]refilling buffer:   8%|▊         | 32626/400000 [00:04<00:41, 8762.30it/s]refilling buffer:  16%|█▋        | 65237/400000 [00:05<00:21, 15368.69it/s]refilling buffer:  24%|██▍       | 97847/400000 [00:06<00:13, 21751.62it/s]refilling buffer:  33%|███▎      | 130467/400000 [00:07<00:09, 27006.69it/s]refilling buffer:  41%|████      | 163075/400000 [00:08<00:07, 31173.50it/s]refilling buffer:  49%|████▉     | 195695/400000 [00:08<00:05, 34377.46it/s]refilling buffer:  57%|█████▋    | 228318/400000 [00:09<00:04, 36503.34it/s]refilling buffer:  65%|██████▌   | 260933/400000 [00:10<00:03, 38020.92it/s]refilling buffer:  73%|███████▎  | 293549/400000 [00:11<00:02, 39388.09it/s]refilling buffer:  82%|████████▏ | 326166/400000 [00:11<00:01, 40352.50it/s]refilling buffer:  90%|████████▉ | 358796/400000 [00:12<00:01, 41058.33it/s]refilling buffer:  98%|█████████▊| 391418/400000 [00:13<00:00, 41570.74it/s]refilling buffer: 100%|██████████| 400000/400000 [00:13<00:00, 29629.38it/s]
+Estimating norm scaling factor:   0%|          | 0/391 [00:00<?, ?it/s]Estimating norm scaling factor:   0%|          | 1/391 [00:00<01:31,  4.25it/s]Estimating norm scaling factor:  71%|███████   | 277/391 [00:00<00:00, 1044.25it/s]Estimating norm scaling factor: 100%|██████████| 391/391 [00:00<00:00, 1034.98it/s]
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.9
+wandb: Run data is saved locally in /workspace/crosscode/wandb/run-20260226_223733-l9koxuxo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run crosscoder_l8192_k32_2026-02-26_22-36-34
+wandb: ⭐️ View project at https://wandb.ai/sohrab-train/crosscoders-protT5
+wandb: 🚀 View run at https://wandb.ai/sohrab-train/crosscoders-protT5/runs/l9koxuxo
+2026-02-26 22:37:36 - INFO - Model size: 402,685,952 parameters (1536.12 MB)
+2026-02-26 22:37:36 - INFO - Training
+Train Steps:   0%|          | 0/11719 [00:00<?, ?it/s]
+refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s][A
+refilling buffer:   0%|          | 1/400000 [00:00<87:16:34,  1.27it/s][A
+refilling buffer:   8%|▊         | 32623/400000 [00:01<00:14, 24783.03it/s][A
+refilling buffer:  16%|█▋        | 65243/400000 [00:02<00:10, 32853.42it/s][A
+refilling buffer:  24%|██▍       | 97879/400000 [00:03<00:08, 36646.64it/s][A
+refilling buffer:  33%|███▎      | 130511/400000 [00:03<00:06, 38702.28it/s][A
+refilling buffer:  41%|████      | 163137/400000 [00:04<00:05, 39963.03it/s][A
+refilling buffer:  49%|████▉     | 195762/400000 [00:05<00:05, 40145.55it/s][A
+refilling buffer:  57%|█████▋    | 228392/400000 [00:06<00:04, 40836.79it/s][A
+refilling buffer:  65%|██████▌   | 261019/400000 [00:06<00:03, 41329.78it/s][A
+refilling buffer:  73%|███████▎  | 293652/400000 [00:07<00:02, 41649.30it/s][A
+refilling buffer:  82%|████████▏ | 326279/400000 [00:08<00:01, 41885.85it/s][A
+refilling buffer:  90%|████████▉ | 358912/400000 [00:09<00:00, 42039.93it/s][A
+refilling buffer:  98%|█████████▊| 391554/400000 [00:10<00:00, 42129.40it/s][Arefilling buffer: 100%|██████████| 400000/400000 [00:10<00:00, 39778.28it/s]
+Train Steps:   0%|          | 1/11719 [00:11<36:05:01, 11.09s/it]Train Steps:   0%|          | 6/11719 [00:11<5:17:52,  1.63s/it] Train Steps:   0%|          | 11/11719 [00:11<2:40:39,  1.21it/s]Train Steps:   0%|          | 16/11719 [00:11<1:42:35,  1.90it/s]Train Steps:   0%|          | 21/11719 [00:11<1:12:43,  2.68it/s]Train Steps:   0%|          | 26/11719 [00:11<54:40,  3.56it/s]  Train Steps:   0%|          | 31/11719 [00:11<42:45,  4.56it/s]Train Steps:   0%|          | 36/11719 [00:11<34:21,  5.67it/s]Train Steps:   0%|          | 41/11719 [00:11<28:14,  6.89it/s]Train Steps:   0%|          | 46/11719 [00:12<23:35,  8.25it/s]Train Steps:   0%|          | 51/11719 [00:12<20:01,  9.71it/s]Train Steps:   0%|          | 56/11719 [00:12<17:11, 11.31it/s]Train Steps:   1%|          | 61/11719 [00:12<14:57, 12.99it/s]Train Steps:   1%|          | 66/11719 [00:12<13:07, 14.79it/s]Train Steps:   1%|          | 71/11719 [00:12<11:39, 16.64it/s]Train Steps:   1%|          | 76/11719 [00:12<10:26, 18.58it/s]Train Steps:   1%|          | 81/11719 [00:12<09:27, 20.51it/s]Train Steps:   1%|          | 86/11719 [00:12<08:37, 22.49it/s]Train Steps:   1%|          | 91/11719 [00:13<07:56, 24.39it/s]Train Steps:   1%|          | 96/11719 [00:13<07:21, 26.33it/s]Train Steps:   1%|          | 101/11719 [00:13<06:54, 28.03it/s]Train Steps:   1%|          | 106/11719 [00:13<06:29, 29.82it/s]Train Steps:   1%|          | 111/11719 [00:13<06:09, 31.41it/s]Train Steps:   1%|          | 116/11719 [00:13<05:51, 33.00it/s]Train Steps:   1%|          | 121/11719 [00:13<05:37, 34.35it/s]Train Steps:   1%|          | 126/11719 [00:13<05:24, 35.71it/s]Train Steps:   1%|          | 131/11719 [00:13<05:14, 36.80it/s]Train Steps:   1%|          | 136/11719 [00:14<05:05, 37.93it/s]Train Steps:   1%|          | 141/11719 [00:14<04:58, 38.78it/s]Train Steps:   1%|          | 146/11719 [00:14<04:51, 39.70it/s]Train Steps:   1%|▏         | 151/11719 [00:14<04:46, 40.34it/s]Train Steps:   1%|▏         | 156/11719 [00:14<04:41, 41.09it/s]Train Steps:   1%|▏         | 161/11719 [00:14<04:38, 41.55it/s]Train Steps:   1%|▏         | 166/11719 [00:14<04:34, 42.14it/s]Train Steps:   1%|▏         | 171/11719 [00:14<04:31, 42.46it/s]Train Steps:   2%|▏         | 176/11719 [00:14<04:28, 42.94it/s]Train Steps:   2%|▏         | 181/11719 [00:15<04:27, 43.14it/s]Train Steps:   2%|▏         | 186/11719 [00:15<04:24, 43.53it/s]Train Steps:   2%|▏         | 191/11719 [00:15<04:24, 43.64it/s]Train Steps:   2%|▏         | 196/11719 [00:15<04:22, 43.95it/s]Train Steps:   2%|▏         | 201/11719 [00:15<04:22, 43.87it/s]Train Steps:   2%|▏         | 206/11719 [00:15<04:20, 44.16it/s]Train Steps:   2%|▏         | 211/11719 [00:15<04:20, 44.18it/s]Train Steps:   2%|▏         | 216/11719 [00:15<04:18, 44.43it/s]Train Steps:   2%|▏         | 221/11719 [00:15<04:18, 44.40it/s]Train Steps:   2%|▏         | 226/11719 [00:16<04:17, 44.60it/s]Train Steps:   2%|▏         | 231/11719 [00:16<04:17, 44.57it/s]Train Steps:   2%|▏         | 236/11719 [00:16<04:16, 44.75it/s]Train Steps:   2%|▏         | 241/11719 [00:16<04:16, 44.68it/s]Train Steps:   2%|▏         | 246/11719 [00:16<04:15, 44.85it/s]Train Steps:   2%|▏         | 251/11719 [00:16<04:16, 44.78it/s]Train Steps:   2%|▏         | 256/11719 [00:16<04:15, 44.93it/s]Train Steps:   2%|▏         | 261/11719 [00:16<04:15, 44.85it/s]Train Steps:   2%|▏         | 266/11719 [00:16<04:14, 44.99it/s]Train Steps:   2%|▏         | 271/11719 [00:17<04:15, 44.87it/s]Train Steps:   2%|▏         | 276/11719 [00:17<04:14, 45.00it/s]Train Steps:   2%|▏         | 281/11719 [00:17<04:14, 44.89it/s]Train Steps:   2%|▏         | 286/11719 [00:17<04:13, 45.02it/s]Train Steps:   2%|▏         | 291/11719 [00:17<04:14, 44.91it/s]Train Steps:   3%|▎         | 296/11719 [00:17<04:13, 45.04it/s]Train Steps:   3%|▎         | 301/11719 [00:17<04:14, 44.78it/s]Train Steps:   3%|▎         | 306/11719 [00:17<04:14, 44.93it/s]Train Steps:   3%|▎         | 311/11719 [00:17<04:14, 44.83it/s]Train Steps:   3%|▎         | 316/11719 [00:18<04:13, 44.98it/s]Train Steps:   3%|▎         | 321/11719 [00:18<04:13, 44.88it/s]Train Steps:   3%|▎         | 326/11719 [00:18<04:13, 45.02it/s]Train Steps:   3%|▎         | 331/11719 [00:18<04:13, 44.91it/s]Train Steps:   3%|▎         | 336/11719 [00:18<04:12, 45.04it/s]Train Steps:   3%|▎         | 341/11719 [00:18<04:13, 44.93it/s]Train Steps:   3%|▎         | 346/11719 [00:18<04:12, 45.06it/s]Train Steps:   3%|▎         | 351/11719 [00:18<04:12, 44.95it/s]Train Steps:   3%|▎         | 356/11719 [00:18<04:12, 45.07it/s]Train Steps:   3%|▎         | 361/11719 [00:19<04:12, 44.93it/s]Train Steps:   3%|▎         | 366/11719 [00:19<04:11, 45.06it/s]Train Steps:   3%|▎         | 371/11719 [00:19<04:12, 44.98it/s]Train Steps:   3%|▎         | 376/11719 [00:19<04:11, 45.09it/s]Train Steps:   3%|▎         | 381/11719 [00:19<04:12, 44.98it/s]Train Steps:   3%|▎         | 386/11719 [00:19<04:11, 45.10it/s]Train Steps:   3%|▎         | 391/11719 [00:19<04:11, 44.98it/s]Train Steps:   3%|▎         | 396/11719 [00:19<04:11, 45.11it/s]Train Steps:   3%|▎         | 401/11719 [00:19<04:12, 44.84it/s]Train Steps:   3%|▎         | 406/11719 [00:20<04:11, 44.97it/s]Train Steps:   4%|▎         | 411/11719 [00:20<04:11, 44.88it/s]Train Steps:   4%|▎         | 416/11719 [00:20<04:11, 45.01it/s]Train Steps:   4%|▎         | 421/11719 [00:20<04:11, 44.91it/s]Train Steps:   4%|▎         | 426/11719 [00:20<04:10, 45.04it/s]Train Steps:   4%|▎         | 431/11719 [00:20<04:11, 44.93it/s]Train Steps:   4%|▎         | 436/11719 [00:20<04:10, 45.06it/s]Train Steps:   4%|▍         | 441/11719 [00:20<04:10, 44.96it/s]Train Steps:   4%|▍         | 446/11719 [00:20<04:10, 45.08it/s]Train Steps:   4%|▍         | 451/11719 [00:21<04:10, 44.97it/s]Train Steps:   4%|▍         | 456/11719 [00:21<04:09, 45.09it/s]Train Steps:   4%|▍         | 461/11719 [00:21<04:10, 44.97it/s]Train Steps:   4%|▍         | 466/11719 [00:21<04:09, 45.10it/s]Train Steps:   4%|▍         | 471/11719 [00:21<04:10, 44.99it/s]Train Steps:   4%|▍         | 476/11719 [00:21<04:09, 45.11it/s]Train Steps:   4%|▍         | 481/11719 [00:21<04:09, 44.99it/s]Train Steps:   4%|▍         | 486/11719 [00:21<04:08, 45.11it/s]Train Steps:   4%|▍         | 491/11719 [00:21<04:09, 44.99it/s]Train Steps:   4%|▍         | 496/11719 [00:22<04:08, 45.12it/s]Train Steps:   4%|▍         | 501/11719 [00:22<04:10, 44.85it/s]Train Steps:   4%|▍         | 506/11719 [00:22<04:09, 44.96it/s]Train Steps:   4%|▍         | 511/11719 [00:22<04:10, 44.76it/s]Train Steps:   4%|▍         | 516/11719 [00:22<04:09, 44.84it/s]Train Steps:   4%|▍         | 521/11719 [00:22<04:10, 44.68it/s]Train Steps:   4%|▍         | 526/11719 [00:22<04:09, 44.79it/s]Train Steps:   5%|▍         | 531/11719 [00:22<04:10, 44.68it/s]Train Steps:   5%|▍         | 536/11719 [00:22<04:09, 44.80it/s]Train Steps:   5%|▍         | 541/11719 [00:23<04:10, 44.69it/s]Train Steps:   5%|▍         | 546/11719 [00:23<04:09, 44.82it/s]Train Steps:   5%|▍         | 551/11719 [00:23<04:09, 44.71it/s]Train Steps:   5%|▍         | 556/11719 [00:23<04:08, 44.85it/s]Train Steps:   5%|▍         | 561/11719 [00:23<04:09, 44.73it/s]Train Steps:   5%|▍         | 566/11719 [00:23<04:08, 44.88it/s]Train Steps:   5%|▍         | 571/11719 [00:23<04:08, 44.78it/s]Train Steps:   5%|▍         | 576/11719 [00:23<04:08, 44.91it/s]Train Steps:   5%|▍         | 581/11719 [00:23<04:08, 44.81it/s]Train Steps:   5%|▌         | 586/11719 [00:24<04:07, 44.94it/s]Train Steps:   5%|▌         | 591/11719 [00:24<04:08, 44.84it/s]Train Steps:   5%|▌         | 596/11719 [00:24<04:07, 44.97it/s]Train Steps:   5%|▌         | 601/11719 [00:24<04:08, 44.72it/s]Train Steps:   5%|▌         | 606/11719 [00:24<04:07, 44.87it/s]Train Steps:   5%|▌         | 611/11719 [00:24<04:08, 44.77it/s]Train Steps:   5%|▌         | 616/11719 [00:24<04:07, 44.92it/s]Train Steps:   5%|▌         | 621/11719 [00:24<04:07, 44.83it/s]Train Steps:   5%|▌         | 626/11719 [00:24<04:06, 44.96it/s]Train Steps:   5%|▌         | 631/11719 [00:25<04:07, 44.86it/s]Train Steps:   5%|▌         | 636/11719 [00:25<04:06, 44.99it/s]Train Steps:   5%|▌         | 641/11719 [00:25<04:06, 44.89it/s]Train Steps:   6%|▌         | 646/11719 [00:25<04:05, 45.02it/s]Train Steps:   6%|▌         | 651/11719 [00:25<04:06, 44.91it/s]Train Steps:   6%|▌         | 656/11719 [00:25<04:05, 45.04it/s]Train Steps:   6%|▌         | 661/11719 [00:25<04:06, 44.93it/s]Train Steps:   6%|▌         | 666/11719 [00:25<04:05, 45.05it/s]Train Steps:   6%|▌         | 671/11719 [00:25<04:05, 44.94it/s]Train Steps:   6%|▌         | 676/11719 [00:26<04:04, 45.07it/s]Train Steps:   6%|▌         | 681/11719 [00:26<04:05, 44.96it/s]Train Steps:   6%|▌         | 686/11719 [00:26<04:04, 45.07it/s]Train Steps:   6%|▌         | 691/11719 [00:26<04:05, 44.96it/s]Train Steps:   6%|▌         | 696/11719 [00:26<04:04, 45.07it/s]Train Steps:   6%|▌         | 701/11719 [00:26<04:14, 43.38it/s]Train Steps:   6%|▌         | 706/11719 [00:26<04:11, 43.72it/s]Train Steps:   6%|▌         | 711/11719 [00:26<04:11, 43.80it/s]Train Steps:   6%|▌         | 716/11719 [00:27<04:09, 44.10it/s]Train Steps:   6%|▌         | 721/11719 [00:27<04:09, 44.13it/s]Train Steps:   6%|▌         | 726/11719 [00:27<04:07, 44.37it/s]Train Steps:   6%|▌         | 731/11719 [00:27<04:07, 44.36it/s]Train Steps:   6%|▋         | 736/11719 [00:27<04:06, 44.58it/s]Train Steps:   6%|▋         | 741/11719 [00:27<04:06, 44.54it/s]Train Steps:   6%|▋         | 746/11719 [00:27<04:05, 44.72it/s]Train Steps:   6%|▋         | 751/11719 [00:27<04:05, 44.66it/s]Train Steps:   6%|▋         | 756/11719 [00:27<04:04, 44.82it/s]Train Steps:   6%|▋         | 761/11719 [00:28<04:04, 44.75it/s]Train Steps:   7%|▋         | 766/11719 [00:28<04:03, 44.91it/s]Train Steps:   7%|▋         | 771/11719 [00:28<04:04, 44.82it/s]Train Steps:   7%|▋         | 776/11719 [00:28<04:03, 44.96it/s]Train Steps:   7%|▋         | 781/11719 [00:28<04:03, 44.86it/s]
+refilling buffer:   0%|          | 0/200192 [00:00<?, ?it/s][A
+refilling buffer:  12%|█▏        | 24191/200192 [00:00<00:05, 30770.93it/s][A
+refilling buffer:  28%|██▊       | 56819/200192 [00:01<00:03, 37176.62it/s][A
+refilling buffer:  45%|████▍     | 89455/200192 [00:02<00:02, 39325.06it/s][A
+refilling buffer:  61%|██████    | 122092/200192 [00:03<00:01, 40167.76it/s][A
+refilling buffer:  77%|███████▋  | 154714/200192 [00:03<00:01, 40593.46it/s][A
+refilling buffer:  94%|█████████▎| 187344/200192 [00:04<00:00, 40956.73it/s][Arefilling buffer: 100%|██████████| 200192/200192 [00:04<00:00, 42472.04it/s]
+Train Steps:   7%|▋         | 786/11719 [00:33<30:44,  5.93it/s]Train Steps:   7%|▋         | 791/11719 [00:33<26:47,  6.80it/s]Train Steps:   7%|▋         | 796/11719 [00:33<23:22,  7.79it/s]Train Steps:   7%|▋         | 801/11719 [00:33<20:28,  8.88it/s]Train Steps:   7%|▋         | 806/11719 [00:33<17:59, 10.11it/s]Train Steps:   7%|▋         | 811/11719 [00:34<15:54, 11.43it/s]Train Steps:   7%|▋         | 816/11719 [00:34<14:06, 12.88it/s]Train Steps:   7%|▋         | 821/11719 [00:34<12:36, 14.41it/s]Train Steps:   7%|▋         | 826/11719 [00:34<11:18, 16.06it/s]Train Steps:   7%|▋         | 831/11719 [00:34<10:13, 17.76it/s]Train Steps:   7%|▋         | 836/11719 [00:34<09:16, 19.56it/s]Train Steps:   7%|▋         | 841/11719 [00:34<08:29, 21.35it/s]Train Steps:   7%|▋         | 846/11719 [00:34<07:48, 23.20it/s]Train Steps:   7%|▋         | 851/11719 [00:34<07:14, 24.99it/s]Train Steps:   7%|▋         | 856/11719 [00:35<06:45, 26.82it/s]Train Steps:   7%|▋         | 861/11719 [00:35<06:20, 28.50it/s]Train Steps:   7%|▋         | 866/11719 [00:35<05:59, 30.21it/s]Train Steps:   7%|▋         | 871/11719 [00:35<05:41, 31.73it/s]Train Steps:   7%|▋         | 876/11719 [00:35<05:25, 33.26it/s]Train Steps:   8%|▊         | 881/11719 [00:35<05:13, 34.56it/s]Train Steps:   8%|▊         | 886/11719 [00:35<05:01, 35.87it/s]Train Steps:   8%|▊         | 891/11719 [00:35<04:53, 36.92it/s]Train Steps:   8%|▊         | 896/11719 [00:35<04:44, 38.03it/s]Train Steps:   8%|▊         | 901/11719 [00:36<04:39, 38.74it/s]Train Steps:   8%|▊         | 906/11719 [00:36<04:32, 39.65it/s]Train Steps:   8%|▊         | 911/11719 [00:36<04:28, 40.28it/s]Train Steps:   8%|▊         | 916/11719 [00:36<04:23, 41.02it/s]Train Steps:   8%|▊         | 921/11719 [00:36<04:20, 41.48it/s]Train Steps:   8%|▊         | 926/11719 [00:36<04:16, 42.07it/s]Train Steps:   8%|▊         | 931/11719 [00:36<04:14, 42.39it/s]Train Steps:   8%|▊         | 936/11719 [00:36<04:11, 42.87it/s]Train Steps:   8%|▊         | 941/11719 [00:36<04:10, 43.07it/s]Train Steps:   8%|▊         | 946/11719 [00:37<04:07, 43.46it/s]Train Steps:   8%|▊         | 951/11719 [00:37<04:07, 43.59it/s]Train Steps:   8%|▊         | 956/11719 [00:37<04:05, 43.90it/s]Train Steps:   8%|▊         | 961/11719 [00:37<04:04, 43.92it/s]Train Steps:   8%|▊         | 966/11719 [00:37<04:03, 44.19it/s]Train Steps:   8%|▊         | 971/11719 [00:37<04:03, 44.21it/s]Train Steps:   8%|▊         | 976/11719 [00:37<04:01, 44.43it/s]Train Steps:   8%|▊         | 981/11719 [00:37<04:01, 44.42it/s]Train Steps:   8%|▊         | 986/11719 [00:37<04:00, 44.61it/s]Train Steps:   8%|▊         | 991/11719 [00:38<04:00, 44.56it/s]Train Steps:   8%|▊         | 996/11719 [00:38<03:59, 44.74it/s]Train Steps:   9%|▊         | 1001/11719 [00:38<04:00, 44.52it/s]Train Steps:   9%|▊         | 1006/11719 [00:38<03:59, 44.70it/s]Train Steps:   9%|▊         | 1011/11719 [00:38<03:59, 44.64it/s]Train Steps:   9%|▊         | 1016/11719 [00:38<03:58, 44.80it/s]Train Steps:   9%|▊         | 1021/11719 [00:38<03:59, 44.73it/s]Train Steps:   9%|▉         | 1026/11719 [00:38<03:58, 44.88it/s]Train Steps:   9%|▉         | 1031/11719 [00:38<03:58, 44.79it/s]Train Steps:   9%|▉         | 1036/11719 [00:39<03:57, 44.93it/s]Train Steps:   9%|▉         | 1041/11719 [00:39<03:58, 44.83it/s]Train Steps:   9%|▉         | 1046/11719 [00:39<03:57, 44.97it/s]Train Steps:   9%|▉         | 1051/11719 [00:39<03:57, 44.87it/s]Train Steps:   9%|▉         | 1056/11719 [00:39<03:56, 45.01it/s]Train Steps:   9%|▉         | 1061/11719 [00:39<03:57, 44.90it/s]Train Steps:   9%|▉         | 1066/11719 [00:39<03:56, 45.03it/s]Train Steps:   9%|▉         | 1071/11719 [00:39<03:57, 44.92it/s]Train Steps:   9%|▉         | 1076/11719 [00:39<03:56, 45.05it/s]Train Steps:   9%|▉         | 1081/11719 [00:40<03:56, 44.93it/s]Train Steps:   9%|▉         | 1086/11719 [00:40<03:55, 45.06it/s]Train Steps:   9%|▉         | 1091/11719 [00:40<03:56, 44.94it/s]Train Steps:   9%|▉         | 1096/11719 [00:40<03:55, 45.06it/s]Train Steps:   9%|▉         | 1101/11719 [00:40<03:57, 44.80it/s]Train Steps:   9%|▉         | 1106/11719 [00:40<03:56, 44.94it/s]Train Steps:   9%|▉         | 1111/11719 [00:40<03:56, 44.84it/s]Train Steps:  10%|▉         | 1116/11719 [00:40<03:55, 44.98it/s]Train Steps:  10%|▉         | 1121/11719 [00:40<03:56, 44.87it/s]Train Steps:  10%|▉         | 1126/11719 [00:41<03:55, 45.00it/s]Train Steps:  10%|▉         | 1131/11719 [00:41<03:55, 44.90it/s]Train Steps:  10%|▉         | 1136/11719 [00:41<03:54, 45.04it/s]Train Steps:  10%|▉         | 1141/11719 [00:41<03:55, 44.88it/s]Train Steps:  10%|▉         | 1146/11719 [00:41<03:54, 45.02it/s]Train Steps:  10%|▉         | 1151/11719 [00:41<03:55, 44.91it/s]Train Steps:  10%|▉         | 1156/11719 [00:41<03:54, 45.04it/s]Train Steps:  10%|▉         | 1161/11719 [00:41<03:54, 44.93it/s]Train Steps:  10%|▉         | 1166/11719 [00:41<03:54, 45.05it/s]Train Steps:  10%|▉         | 1171/11719 [00:42<03:54, 44.94it/s]Train Steps:  10%|█         | 1176/11719 [00:42<03:53, 45.06it/s]Train Steps:  10%|█         | 1181/11719 [00:42<03:54, 44.95it/s]Train Steps:  10%|█         | 1186/11719 [00:42<03:53, 45.07it/s]Train Steps:  10%|█         | 1191/11719 [00:42<03:54, 44.95it/s]Train Steps:  10%|█         | 1196/11719 [00:42<03:53, 45.05it/s]Train Steps:  10%|█         | 1201/11719 [00:42<03:54, 44.79it/s]Train Steps:  10%|█         | 1206/11719 [00:42<03:53, 44.93it/s]Train Steps:  10%|█         | 1211/11719 [00:42<03:54, 44.84it/s]Train Steps:  10%|█         | 1216/11719 [00:43<03:53, 44.98it/s]Train Steps:  10%|█         | 1221/11719 [00:43<03:53, 44.88it/s]Train Steps:  10%|█         | 1226/11719 [00:43<03:53, 45.01it/s]Train Steps:  11%|█         | 1231/11719 [00:43<03:53, 44.90it/s]Train Steps:  11%|█         | 1236/11719 [00:43<03:52, 45.03it/s]Train Steps:  11%|█         | 1241/11719 [00:43<03:54, 44.74it/s]Train Steps:  11%|█         | 1246/11719 [00:43<03:53, 44.91it/s]Train Steps:  11%|█         | 1251/11719 [00:43<03:53, 44.83it/s]Train Steps:  11%|█         | 1256/11719 [00:43<03:52, 45.07it/s]Train Steps:  11%|█         | 1261/11719 [00:44<03:52, 45.03it/s]Train Steps:  11%|█         | 1266/11719 [00:44<03:51, 45.25it/s]Train Steps:  11%|█         | 1271/11719 [00:44<03:51, 45.19it/s]Train Steps:  11%|█         | 1276/11719 [00:44<03:50, 45.38it/s]Train Steps:  11%|█         | 1281/11719 [00:44<03:50, 45.30it/s]Train Steps:  11%|█         | 1286/11719 [00:44<03:49, 45.48it/s]Train Steps:  11%|█         | 1291/11719 [00:44<03:49, 45.38it/s]Train Steps:  11%|█         | 1296/11719 [00:44<03:48, 45.54it/s]Train Steps:  11%|█         | 1301/11719 [00:44<03:50, 45.28it/s]Train Steps:  11%|█         | 1306/11719 [00:45<03:49, 45.45it/s]Train Steps:  11%|█         | 1311/11719 [00:45<03:49, 45.36it/s]Train Steps:  11%|█         | 1316/11719 [00:45<03:48, 45.52it/s]Train Steps:  11%|█▏        | 1321/11719 [00:45<03:49, 45.39it/s]Train Steps:  11%|█▏        | 1326/11719 [00:45<03:48, 45.55it/s]Train Steps:  11%|█▏        | 1331/11719 [00:45<03:48, 45.45it/s]Train Steps:  11%|█▏        | 1336/11719 [00:45<03:47, 45.60it/s]Train Steps:  11%|█▏        | 1341/11719 [00:45<03:48, 45.49it/s]Train Steps:  11%|█▏        | 1346/11719 [00:45<03:47, 45.64it/s]Train Steps:  12%|█▏        | 1351/11719 [00:45<03:47, 45.52it/s]Train Steps:  12%|█▏        | 1356/11719 [00:46<03:46, 45.66it/s]Train Steps:  12%|█▏        | 1361/11719 [00:46<03:47, 45.53it/s]Train Steps:  12%|█▏        | 1366/11719 [00:46<03:46, 45.67it/s]Train Steps:  12%|█▏        | 1371/11719 [00:46<03:47, 45.55it/s]Train Steps:  12%|█▏        | 1376/11719 [00:46<03:46, 45.69it/s]Train Steps:  12%|█▏        | 1381/11719 [00:46<03:46, 45.57it/s]Train Steps:  12%|█▏        | 1386/11719 [00:46<03:46, 45.70it/s]Train Steps:  12%|█▏        | 1391/11719 [00:46<03:46, 45.57it/s]Train Steps:  12%|█▏        | 1396/11719 [00:46<03:45, 45.71it/s]Train Steps:  12%|█▏        | 1401/11719 [00:47<03:47, 45.41it/s]Train Steps:  12%|█▏        | 1406/11719 [00:47<03:46, 45.56it/s]Train Steps:  12%|█▏        | 1411/11719 [00:47<03:46, 45.45it/s]Train Steps:  12%|█▏        | 1416/11719 [00:47<03:45, 45.60it/s]Train Steps:  12%|█▏        | 1421/11719 [00:47<03:46, 45.48it/s]Train Steps:  12%|█▏        | 1426/11719 [00:47<03:45, 45.63it/s]Train Steps:  12%|█▏        | 1431/11719 [00:47<03:46, 45.47it/s]Train Steps:  12%|█▏        | 1436/11719 [00:47<03:45, 45.61it/s]Train Steps:  12%|█▏        | 1441/11719 [00:47<03:45, 45.48it/s]Train Steps:  12%|█▏        | 1446/11719 [00:48<03:45, 45.62it/s]Train Steps:  12%|█▏        | 1451/11719 [00:48<03:45, 45.50it/s]Train Steps:  12%|█▏        | 1456/11719 [00:48<03:44, 45.63it/s]Train Steps:  12%|█▏        | 1461/11719 [00:48<03:45, 45.52it/s]Train Steps:  13%|█▎        | 1466/11719 [00:48<03:44, 45.65it/s]Train Steps:  13%|█▎        | 1471/11719 [00:48<03:45, 45.52it/s]Train Steps:  13%|█▎        | 1476/11719 [00:48<03:44, 45.67it/s]Train Steps:  13%|█▎        | 1481/11719 [00:48<03:44, 45.54it/s]Train Steps:  13%|█▎        | 1486/11719 [00:48<03:44, 45.67it/s]Train Steps:  13%|█▎        | 1491/11719 [00:49<03:44, 45.55it/s]Train Steps:  13%|█▎        | 1496/11719 [00:49<03:43, 45.69it/s]Train Steps:  13%|█▎        | 1501/11719 [00:49<03:45, 45.35it/s]Train Steps:  13%|█▎        | 1506/11719 [00:49<03:44, 45.51it/s]Train Steps:  13%|█▎        | 1511/11719 [00:49<03:44, 45.41it/s]Train Steps:  13%|█▎        | 1516/11719 [00:49<03:43, 45.57it/s]Train Steps:  13%|█▎        | 1521/11719 [00:49<03:44, 45.46it/s]Train Steps:  13%|█▎        | 1526/11719 [00:49<03:43, 45.61it/s]Train Steps:  13%|█▎        | 1531/11719 [00:49<03:43, 45.49it/s]Train Steps:  13%|█▎        | 1536/11719 [00:50<03:43, 45.63it/s]Train Steps:  13%|█▎        | 1541/11719 [00:50<03:43, 45.51it/s]Train Steps:  13%|█▎        | 1546/11719 [00:50<03:42, 45.65it/s]Train Steps:  13%|█▎        | 1551/11719 [00:50<03:43, 45.54it/s]Train Steps:  13%|█▎        | 1556/11719 [00:50<03:42, 45.67it/s]Train Steps:  13%|█▎        | 1561/11719 [00:50<03:43, 45.54it/s]
+refilling buffer:   0%|          | 0/200192 [00:00<?, ?it/s][A
+refilling buffer:  10%|▉         | 19786/200192 [00:00<00:07, 24919.09it/s][A
+refilling buffer:  26%|██▌       | 52408/200192 [00:01<00:04, 32493.07it/s][A
+refilling buffer:  42%|████▏     | 85049/200192 [00:02<00:03, 35983.50it/s][A
+refilling buffer:  59%|█████▉    | 117683/200192 [00:03<00:02, 37599.72it/s][Arefilling buffer:  75%|███████▌  | 150313/200192 [00:03<00:01, 42317.08it/s]
+Train Steps:  13%|█▎        | 1564/11719 [00:54<05:52, 28.85it/s]
+Traceback (most recent call last):
+  File "/workspace/crosscode/crosscode/trainers/topk_crosscoder/run.py", line 101, in <module>
+    fire.Fire(run_exp(build_trainer, TopKAcausalCrosscoderExperimentConfig))
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/trainers/base_trainer.py", line 192, in inner
+    trainer.train()
+  File "/workspace/crosscode/crosscode/trainers/base_trainer.py", line 87, in train
+    batch = next(epoch_dataloader)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 70, in <genexpr>
+    return (ModelHookpointActivationsBatch(batch) for batch in self._iterator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 108, in _iterate_activations_BMPD
+    for i, batch_BMPD in enumerate(batch_iter_BMPD):
+  File "/workspace/crosscode/crosscode/data/shuffle.py", line 57, in _batch_shuffle_iterator
+    refill()
+  File "/workspace/crosscode/crosscode/data/shuffle.py", line 48, in refill
+    for item in tqdm(islice(iterator, needed), total=needed, desc="refilling buffer"):
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 87, in example_iterator_MPD
+    for hbatch_HsMPD in iterator_HsMPD:
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 77, in _iterate_activations_HsMPD
+    activations_HSMPD = self._activations_harvester.get_activations_HSMPD(seq.tokens_HS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 209, in get_activations_HSMPD
+    activations_HSPD.append(self._get_acts_HSPD(model, sequence_HS))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 185, in _get_acts_HSPD
+    cache = self._strategy.run_with_cache(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 115, in run_with_cache
+    model_to_run(
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 1131, in forward
+    layer_outputs = layer_module(
+                    ^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 682, in forward
+    self_attention_outputs = self.layer[0](
+                             ^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 600, in forward
+    attention_output = self.SelfAttention(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 559, in forward
+    attn_weights = nn.functional.softmax(scores.float(), dim=-1).type_as(scores)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/functional.py", line 2140, in softmax
+    ret = input.softmax(dim)
+          ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 93.02 GiB of which 1.65 GiB is free. Including non-PyTorch memory, this process has 91.36 GiB memory in use. Of the allocated memory 86.57 GiB is allocated by PyTorch, and 4.06 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: lrz-hgx-h100-027: task 0: Exited with exit code 1

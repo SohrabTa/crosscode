@@ -1,0 +1,219 @@
+pyxis: importing docker image: nvcr.io/nvidia/pytorch:25.12-py3
+pyxis: imported docker image: nvcr.io/nvidia/pytorch:25.12-py3
+wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+2026-02-25 23:14:19 - INFO - Starting...
+2026-02-25 23:14:19 - INFO - Loading config...
+2026-02-25 23:14:19 - INFO - Loaded config (raw):
+{'data': {'token_sequence_loader': {'type': 'fasta', 'fasta_path': '/workspace/data/dataset/uniref50_3M_length_512.fasta', 'max_sequence_length': 512}, 'activations_harvester': {'llms': [{'hf_model_name': 'Rostlab/prot_t5_xl_uniref50', 'base_architecture_name': 'T5ForConditionalGeneration'}], 'harvesting_batch_size': 128, 'cache_mode': 'no_cache'}, 'activations_shuffle_buffer_size': 400000}, 'crosscoder': {'n_latents': 8192, 'k': 32}, 'train': {'batch_size': 256, 'num_steps': 11719, 'log_every_n_steps': 10, 'topk_style': 'batch_topk', 'dead_latents_threshold_n_examples': 5000000, 'k_aux': 512, 'lambda_aux': 0.03125}, 'experiment_name': 'crosscoder_l8192_k32', 'wandb': {'entity': 'sohrab-train', 'project': 'crosscoders-protT5'}, 'base_save_dir': '/workspace/data/checkpoints', 'cache_dir': '/workspace/data/hf_home/', 'hookpoints': ['encoder.blocks.1.hook_resid_post', 'encoder.blocks.2.hook_resid_post', 'encoder.blocks.3.hook_resid_post', 'encoder.blocks.4.hook_resid_post', 'encoder.blocks.5.hook_resid_post', 'encoder.blocks.6.hook_resid_post', 'encoder.blocks.7.hook_resid_post', 'encoder.blocks.8.hook_resid_post', 'encoder.blocks.9.hook_resid_post', 'encoder.blocks.10.hook_resid_post', 'encoder.blocks.11.hook_resid_post', 'encoder.blocks.12.hook_resid_post', 'encoder.blocks.13.hook_resid_post', 'encoder.blocks.14.hook_resid_post', 'encoder.blocks.15.hook_resid_post', 'encoder.blocks.16.hook_resid_post', 'encoder.blocks.17.hook_resid_post', 'encoder.blocks.18.hook_resid_post', 'encoder.blocks.19.hook_resid_post', 'encoder.blocks.20.hook_resid_post', 'encoder.blocks.21.hook_resid_post', 'encoder.blocks.22.hook_resid_post', 'encoder.blocks.23.hook_resid_post', 'encoder.blocks.24.hook_resid_post']}
+2026-02-25 23:14:19 - INFO - Loaded config (parsed):
+{
+  "seed": 42,
+  "cache_dir": "/workspace/data/hf_home/",
+  "base_save_dir": "/workspace/data/checkpoints",
+  "wandb": {
+    "entity": "sohrab-train",
+    "project": "crosscoders-protT5",
+    "mode": "online"
+  },
+  "experiment_name": "crosscoder_l8192_k32",
+  "data": {
+    "token_sequence_loader": {
+      "type": "fasta",
+      "fasta_path": "/workspace/data/dataset/uniref50_3M_length_512.fasta",
+      "max_sequence_length": 512,
+      "sequences_shuffle_buffer_size": null
+    },
+    "activations_harvester": {
+      "llms": [
+        {
+          "name": null,
+          "revision": null,
+          "base_architecture_name": "T5ForConditionalGeneration",
+          "hf_model_name": "Rostlab/prot_t5_xl_uniref50"
+        }
+      ],
+      "inference_dtype": "float32",
+      "harvesting_batch_size": 128,
+      "cache_mode": "no_cache"
+    },
+    "n_tokens_for_norm_estimate": 100000,
+    "activations_shuffle_buffer_size": 400000
+  },
+  "crosscoder": {
+    "n_latents": 8192,
+    "use_encoder_bias": true,
+    "use_decoder_bias": true,
+    "init_strategy": "anthropic_transpose",
+    "datapoint_scale": 0.4,
+    "dec_init_norm": 0.1,
+    "k": 32
+  },
+  "train": {
+    "batch_size": 256,
+    "optimizer": {
+      "type": "adam",
+      "warmup_pct": 0.05,
+      "learning_rate": 0.00005,
+      "warmdown_pct": 0.2,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    },
+    "num_steps": 11719,
+    "save_every_n_steps": null,
+    "upload_saves_to_wandb": false,
+    "log_every_n_steps": 10,
+    "gradient_accumulation_steps_per_batch": 1,
+    "topk_style": "batch_topk",
+    "dead_latents_threshold_n_examples": 5000000,
+    "lambda_aux": 0.03125,
+    "k_aux": 512
+  },
+  "hookpoints": [
+    "encoder.blocks.1.hook_resid_post",
+    "encoder.blocks.2.hook_resid_post",
+    "encoder.blocks.3.hook_resid_post",
+    "encoder.blocks.4.hook_resid_post",
+    "encoder.blocks.5.hook_resid_post",
+    "encoder.blocks.6.hook_resid_post",
+    "encoder.blocks.7.hook_resid_post",
+    "encoder.blocks.8.hook_resid_post",
+    "encoder.blocks.9.hook_resid_post",
+    "encoder.blocks.10.hook_resid_post",
+    "encoder.blocks.11.hook_resid_post",
+    "encoder.blocks.12.hook_resid_post",
+    "encoder.blocks.13.hook_resid_post",
+    "encoder.blocks.14.hook_resid_post",
+    "encoder.blocks.15.hook_resid_post",
+    "encoder.blocks.16.hook_resid_post",
+    "encoder.blocks.17.hook_resid_post",
+    "encoder.blocks.18.hook_resid_post",
+    "encoder.blocks.19.hook_resid_post",
+    "encoder.blocks.20.hook_resid_post",
+    "encoder.blocks.21.hook_resid_post",
+    "encoder.blocks.22.hook_resid_post",
+    "encoder.blocks.23.hook_resid_post",
+    "encoder.blocks.24.hook_resid_post"
+  ]
+}
+2026-02-25 23:14:19 - INFO - over-wrote experiment_name: crosscoder_l8192_k32_2026-02-25_23-14-19
+2026-02-25 23:14:19 - INFO - saving in save_dir: /workspace/data/checkpoints/crosscoder_l8192_k32_2026-02-25_23-14-19
+2026-02-25 23:14:19 - INFO - Saved config to /workspace/data/checkpoints/crosscoder_l8192_k32_2026-02-25_23-14-19/experiment_config.yaml
+2026-02-25 23:14:19 - INFO - Building trainer
+2026-02-25 23:14:20 - INFO - Loading HuggingFace model Rostlab/prot_t5_xl_uniref50 into T5EncoderModel
+You are using the default legacy behaviour of the <class 'transformers.models.t5.tokenization_t5.T5Tokenizer'>. This is expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you. If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it means, and thoroughly read the reason why this was added as explained in https://github.com/huggingface/transformers/pull/24565
+2026-02-25 23:15:08 - INFO - Assigned model key: tl-T5ForConditionalGeneration_hf-Rostlab_prot_t5_xl_uniref50
+2026-02-25 23:15:10 - INFO - computed last needed layer: 24, stopping at 25
+refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s]refilling buffer:   0%|          | 1/400000 [00:05<566:20:51,  5.10s/it]refilling buffer:  16%|█▋        | 65237/400000 [00:06<00:26, 12843.64it/s]refilling buffer:  33%|███▎      | 130467/400000 [00:08<00:12, 21849.01it/s]refilling buffer:  49%|████▉     | 195695/400000 [00:09<00:07, 28163.11it/s]refilling buffer:  65%|██████▌   | 260933/400000 [00:11<00:04, 32597.91it/s]refilling buffer:  82%|████████▏ | 326166/400000 [00:12<00:02, 35427.67it/s]refilling buffer:  98%|█████████▊| 391418/400000 [00:14<00:00, 37582.57it/s]refilling buffer: 100%|██████████| 400000/400000 [00:14<00:00, 28054.96it/s]
+Estimating norm scaling factor:   0%|          | 0/391 [00:00<?, ?it/s]Estimating norm scaling factor:   0%|          | 1/391 [00:00<03:58,  1.64it/s]Estimating norm scaling factor:  66%|██████▋   | 260/391 [00:00<00:00, 491.68it/s]Estimating norm scaling factor: 100%|██████████| 391/391 [00:00<00:00, 513.19it/s]
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: sohrab-t (sohrab-train) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: creating run
+wandb: Tracking run with wandb version 0.19.9
+wandb: Run data is saved locally in /workspace/crosscode/wandb/run-20260225_231531-j3b9qhzi
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run crosscoder_l8192_k32_2026-02-25_23-14-19
+wandb: ⭐️ View project at https://wandb.ai/sohrab-train/crosscoders-protT5
+wandb: 🚀 View run at https://wandb.ai/sohrab-train/crosscoders-protT5/runs/j3b9qhzi
+2026-02-25 23:15:34 - INFO - Model size: 402,685,952 parameters (1536.12 MB)
+2026-02-25 23:15:34 - INFO - Training
+Train Steps:   0%|          | 0/11719 [00:00<?, ?it/s]
+refilling buffer:   0%|          | 0/400000 [00:00<?, ?it/s][A
+refilling buffer:   0%|          | 1/400000 [00:01<167:41:42,  1.51s/it][A
+refilling buffer:  16%|█▋        | 65257/400000 [00:03<00:13, 25376.79it/s][A
+refilling buffer:  33%|███▎      | 130515/400000 [00:04<00:08, 33346.81it/s][A
+refilling buffer:  49%|████▉     | 195770/400000 [00:06<00:05, 37068.94it/s][A
+refilling buffer:  65%|██████▌   | 261030/400000 [00:07<00:03, 39087.07it/s][A
+refilling buffer:  82%|████████▏ | 326290/400000 [00:09<00:01, 40283.63it/s][A
+refilling buffer:  98%|█████████▊| 391569/400000 [00:10<00:00, 41032.64it/s][Arefilling buffer: 100%|██████████| 400000/400000 [00:10<00:00, 37453.73it/s]
+Train Steps:   0%|          | 1/11719 [00:12<40:30:36, 12.45s/it]Train Steps:   0%|          | 6/11719 [00:12<5:56:47,  1.83s/it] Train Steps:   0%|          | 11/11719 [00:12<3:00:03,  1.08it/s]Train Steps:   0%|          | 16/11719 [00:12<1:54:47,  1.70it/s]Train Steps:   0%|          | 21/11719 [00:12<1:21:11,  2.40it/s]Train Steps:   0%|          | 26/11719 [00:13<1:00:54,  3.20it/s]Train Steps:   0%|          | 31/11719 [00:13<47:30,  4.10it/s]  Train Steps:   0%|          | 36/11719 [00:13<38:04,  5.11it/s]Train Steps:   0%|          | 41/11719 [00:13<31:11,  6.24it/s]Train Steps:   0%|          | 46/11719 [00:13<25:57,  7.49it/s]Train Steps:   0%|          | 51/11719 [00:13<21:56,  8.86it/s]Train Steps:   0%|          | 56/11719 [00:13<18:45, 10.36it/s]Train Steps:   1%|          | 61/11719 [00:13<16:15, 11.96it/s]Train Steps:   1%|          | 66/11719 [00:13<14:11, 13.68it/s]Train Steps:   1%|          | 71/11719 [00:13<12:33, 15.47it/s]Train Steps:   1%|          | 76/11719 [00:14<11:10, 17.36it/s]Train Steps:   1%|          | 81/11719 [00:14<10:04, 19.26it/s]Train Steps:   1%|          | 86/11719 [00:14<09:07, 21.23it/s]Train Steps:   1%|          | 91/11719 [00:14<08:22, 23.14it/s]Train Steps:   1%|          | 96/11719 [00:14<07:42, 25.10it/s]Train Steps:   1%|          | 101/11719 [00:14<07:12, 26.88it/s]Train Steps:   1%|          | 106/11719 [00:14<06:44, 28.72it/s]Train Steps:   1%|          | 111/11719 [00:14<06:21, 30.39it/s]Train Steps:   1%|          | 116/11719 [00:14<06:01, 32.08it/s]Train Steps:   1%|          | 121/11719 [00:15<05:46, 33.50it/s]Train Steps:   1%|          | 126/11719 [00:15<05:31, 34.95it/s]Train Steps:   1%|          | 131/11719 [00:15<05:20, 36.14it/s]Train Steps:   1%|          | 136/11719 [00:15<05:10, 37.36it/s]Train Steps:   1%|          | 141/11719 [00:15<05:02, 38.30it/s]Train Steps:   1%|          | 146/11719 [00:15<04:54, 39.30it/s]Train Steps:   1%|▏         | 151/11719 [00:15<04:49, 40.02it/s]Train Steps:   1%|▏         | 156/11719 [00:15<04:43, 40.82it/s]Train Steps:   1%|▏         | 161/11719 [00:15<04:39, 41.35it/s]Train Steps:   1%|▏         | 166/11719 [00:16<04:35, 41.99it/s]Train Steps:   1%|▏         | 171/11719 [00:16<04:32, 42.37it/s]Train Steps:   2%|▏         | 176/11719 [00:16<04:29, 42.88it/s]Train Steps:   2%|▏         | 181/11719 [00:16<04:27, 43.13it/s]Train Steps:   2%|▏         | 186/11719 [00:16<04:24, 43.54it/s]Train Steps:   2%|▏         | 191/11719 [00:16<04:23, 43.71it/s]Train Steps:   2%|▏         | 196/11719 [00:16<04:21, 44.04it/s]Train Steps:   2%|▏         | 201/11719 [00:16<04:22, 43.96it/s]Train Steps:   2%|▏         | 206/11719 [00:16<04:20, 44.27it/s]Train Steps:   2%|▏         | 211/11719 [00:17<04:19, 44.31it/s]Train Steps:   2%|▏         | 216/11719 [00:17<04:18, 44.57it/s]Train Steps:   2%|▏         | 221/11719 [00:17<04:17, 44.58it/s]Train Steps:   2%|▏         | 226/11719 [00:17<04:16, 44.80it/s]Train Steps:   2%|▏         | 231/11719 [00:17<04:16, 44.77it/s]Train Steps:   2%|▏         | 236/11719 [00:17<04:15, 44.96it/s]Train Steps:   2%|▏         | 241/11719 [00:17<04:15, 44.91it/s]Train Steps:   2%|▏         | 246/11719 [00:17<04:14, 45.08it/s]Train Steps:   2%|▏         | 251/11719 [00:17<04:14, 45.01it/s]Train Steps:   2%|▏         | 256/11719 [00:18<04:13, 45.18it/s]Train Steps:   2%|▏         | 261/11719 [00:18<04:14, 45.10it/s]Train Steps:   2%|▏         | 266/11719 [00:18<04:13, 45.24it/s]Train Steps:   2%|▏         | 271/11719 [00:18<04:13, 45.15it/s]Train Steps:   2%|▏         | 276/11719 [00:18<04:12, 45.29it/s]Train Steps:   2%|▏         | 281/11719 [00:18<04:13, 45.20it/s]Train Steps:   2%|▏         | 286/11719 [00:18<04:12, 45.33it/s]Train Steps:   2%|▏         | 291/11719 [00:18<04:12, 45.22it/s]Train Steps:   3%|▎         | 296/11719 [00:18<04:11, 45.35it/s]Train Steps:   3%|▎         | 301/11719 [00:19<04:13, 45.10it/s]Train Steps:   3%|▎         | 306/11719 [00:19<04:12, 45.24it/s]Train Steps:   3%|▎         | 311/11719 [00:19<04:12, 45.15it/s]Train Steps:   3%|▎         | 316/11719 [00:19<04:11, 45.30it/s]Train Steps:   3%|▎         | 321/11719 [00:19<04:12, 45.19it/s]Train Steps:   3%|▎         | 326/11719 [00:19<04:11, 45.31it/s]Train Steps:   3%|▎         | 331/11719 [00:19<04:12, 45.18it/s]Train Steps:   3%|▎         | 336/11719 [00:19<04:11, 45.31it/s]Train Steps:   3%|▎         | 341/11719 [00:19<04:12, 45.14it/s]Train Steps:   3%|▎         | 346/11719 [00:20<04:10, 45.33it/s]Train Steps:   3%|▎         | 351/11719 [00:20<04:11, 45.22it/s]Train Steps:   3%|▎         | 356/11719 [00:20<04:10, 45.36it/s]Train Steps:   3%|▎         | 361/11719 [00:20<04:11, 45.25it/s]Train Steps:   3%|▎         | 366/11719 [00:20<04:10, 45.38it/s]Train Steps:   3%|▎         | 371/11719 [00:20<04:10, 45.25it/s]Train Steps:   3%|▎         | 376/11719 [00:20<04:09, 45.38it/s]Train Steps:   3%|▎         | 381/11719 [00:20<04:10, 45.27it/s]Train Steps:   3%|▎         | 386/11719 [00:20<04:09, 45.39it/s]Train Steps:   3%|▎         | 391/11719 [00:21<04:10, 45.28it/s]Train Steps:   3%|▎         | 396/11719 [00:21<04:09, 45.39it/s]Train Steps:   3%|▎         | 401/11719 [00:21<04:10, 45.14it/s]Train Steps:   3%|▎         | 406/11719 [00:21<04:09, 45.28it/s]Train Steps:   4%|▎         | 411/11719 [00:21<04:10, 45.18it/s]Train Steps:   4%|▎         | 416/11719 [00:21<04:09, 45.33it/s]Train Steps:   4%|▎         | 421/11719 [00:21<04:09, 45.22it/s]Train Steps:   4%|▎         | 426/11719 [00:21<04:08, 45.36it/s]Train Steps:   4%|▎         | 431/11719 [00:21<04:09, 45.24it/s]Train Steps:   4%|▎         | 436/11719 [00:22<04:08, 45.37it/s]Train Steps:   4%|▍         | 441/11719 [00:22<04:09, 45.27it/s]Train Steps:   4%|▍         | 446/11719 [00:22<04:08, 45.39it/s]Train Steps:   4%|▍         | 451/11719 [00:22<04:08, 45.28it/s]Train Steps:   4%|▍         | 456/11719 [00:22<04:08, 45.40it/s]Train Steps:   4%|▍         | 461/11719 [00:22<04:08, 45.30it/s]Train Steps:   4%|▍         | 466/11719 [00:22<04:07, 45.41it/s]Train Steps:   4%|▍         | 471/11719 [00:22<04:08, 45.29it/s]Train Steps:   4%|▍         | 476/11719 [00:22<04:07, 45.42it/s]Train Steps:   4%|▍         | 481/11719 [00:23<04:08, 45.27it/s]Train Steps:   4%|▍         | 486/11719 [00:23<04:07, 45.40it/s]Train Steps:   4%|▍         | 491/11719 [00:23<04:07, 45.29it/s]Train Steps:   4%|▍         | 496/11719 [00:23<04:07, 45.40it/s]Train Steps:   4%|▍         | 501/11719 [00:23<04:08, 45.13it/s]Train Steps:   4%|▍         | 506/11719 [00:23<04:07, 45.28it/s]Train Steps:   4%|▍         | 511/11719 [00:23<04:08, 45.18it/s]Train Steps:   4%|▍         | 516/11719 [00:23<04:07, 45.31it/s]Train Steps:   4%|▍         | 521/11719 [00:23<04:07, 45.21it/s]Train Steps:   4%|▍         | 526/11719 [00:24<04:06, 45.34it/s]Train Steps:   5%|▍         | 531/11719 [00:24<04:07, 45.22it/s]Train Steps:   5%|▍         | 536/11719 [00:24<04:06, 45.35it/s]Train Steps:   5%|▍         | 541/11719 [00:24<04:07, 45.13it/s]Train Steps:   5%|▍         | 546/11719 [00:24<04:06, 45.29it/s]Train Steps:   5%|▍         | 551/11719 [00:24<04:07, 45.20it/s]Train Steps:   5%|▍         | 556/11719 [00:24<04:06, 45.33it/s]Train Steps:   5%|▍         | 561/11719 [00:24<04:06, 45.22it/s]Train Steps:   5%|▍         | 566/11719 [00:24<04:05, 45.35it/s]Train Steps:   5%|▍         | 571/11719 [00:25<04:06, 45.24it/s]Train Steps:   5%|▍         | 576/11719 [00:25<04:05, 45.37it/s]Train Steps:   5%|▍         | 581/11719 [00:25<04:06, 45.26it/s]Train Steps:   5%|▌         | 586/11719 [00:25<04:05, 45.39it/s]Train Steps:   5%|▌         | 591/11719 [00:25<04:05, 45.27it/s]Train Steps:   5%|▌         | 596/11719 [00:25<04:05, 45.39it/s]Train Steps:   5%|▌         | 601/11719 [00:25<04:06, 45.11it/s]Train Steps:   5%|▌         | 606/11719 [00:25<04:05, 45.24it/s]Train Steps:   5%|▌         | 611/11719 [00:25<04:06, 45.15it/s]Train Steps:   5%|▌         | 616/11719 [00:26<04:05, 45.30it/s]Train Steps:   5%|▌         | 621/11719 [00:26<04:05, 45.20it/s]Train Steps:   5%|▌         | 626/11719 [00:26<04:04, 45.31it/s]Train Steps:   5%|▌         | 631/11719 [00:26<04:05, 45.21it/s]Train Steps:   5%|▌         | 636/11719 [00:26<04:04, 45.34it/s]Train Steps:   5%|▌         | 641/11719 [00:26<04:04, 45.23it/s]Train Steps:   6%|▌         | 646/11719 [00:26<04:04, 45.36it/s]Train Steps:   6%|▌         | 651/11719 [00:26<04:21, 42.25it/s]Train Steps:   6%|▌         | 656/11719 [00:26<04:18, 42.78it/s]Train Steps:   6%|▌         | 661/11719 [00:27<04:16, 43.04it/s]Train Steps:   6%|▌         | 666/11719 [00:27<04:14, 43.48it/s]Train Steps:   6%|▌         | 671/11719 [00:27<04:13, 43.64it/s]Train Steps:   6%|▌         | 676/11719 [00:27<04:11, 43.99it/s]Train Steps:   6%|▌         | 681/11719 [00:27<04:10, 44.08it/s]Train Steps:   6%|▌         | 686/11719 [00:27<04:08, 44.37it/s]Train Steps:   6%|▌         | 691/11719 [00:27<04:08, 44.42it/s]Train Steps:   6%|▌         | 696/11719 [00:27<04:06, 44.66it/s]Train Steps:   6%|▌         | 701/11719 [00:27<04:07, 44.52it/s]Train Steps:   6%|▌         | 706/11719 [00:28<04:06, 44.74it/s]Train Steps:   6%|▌         | 711/11719 [00:28<04:06, 44.73it/s]Train Steps:   6%|▌         | 716/11719 [00:28<04:04, 44.93it/s]Train Steps:   6%|▌         | 721/11719 [00:28<04:04, 44.89it/s]Train Steps:   6%|▌         | 726/11719 [00:28<04:03, 45.06it/s]Train Steps:   6%|▌         | 731/11719 [00:28<04:04, 45.00it/s]Train Steps:   6%|▋         | 736/11719 [00:28<04:03, 45.16it/s]Train Steps:   6%|▋         | 741/11719 [00:28<04:03, 45.07it/s]Train Steps:   6%|▋         | 746/11719 [00:28<04:02, 45.22it/s]Train Steps:   6%|▋         | 751/11719 [00:29<04:03, 45.12it/s]Train Steps:   6%|▋         | 756/11719 [00:29<04:02, 45.27it/s]Train Steps:   6%|▋         | 761/11719 [00:29<04:02, 45.17it/s]Train Steps:   7%|▋         | 766/11719 [00:29<04:01, 45.30it/s]Train Steps:   7%|▋         | 771/11719 [00:29<04:02, 45.17it/s]Train Steps:   7%|▋         | 776/11719 [00:29<04:01, 45.32it/s]Train Steps:   7%|▋         | 781/11719 [00:29<04:01, 45.22it/s]
+refilling buffer:   0%|          | 0/200192 [00:00<?, ?it/s][A
+refilling buffer:  28%|██▊       | 56833/200192 [00:01<00:04, 34517.55it/s][A
+refilling buffer:  61%|██████    | 122092/200192 [00:03<00:02, 37297.11it/s][Arefilling buffer:  94%|█████████▎| 187355/200192 [00:04<00:00, 43346.13it/s]
+Train Steps:   7%|▋         | 782/11719 [00:34<07:56, 22.95it/s]
+Traceback (most recent call last):
+  File "/workspace/crosscode/crosscode/trainers/topk_crosscoder/run.py", line 101, in <module>
+    fire.Fire(run_exp(build_trainer, TopKAcausalCrosscoderExperimentConfig))
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/trainers/base_trainer.py", line 192, in inner
+    trainer.train()
+  File "/workspace/crosscode/crosscode/trainers/base_trainer.py", line 87, in train
+    batch = next(epoch_dataloader)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 70, in <genexpr>
+    return (ModelHookpointActivationsBatch(batch) for batch in self._iterator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 108, in _iterate_activations_BMPD
+    for i, batch_BMPD in enumerate(batch_iter_BMPD):
+  File "/workspace/crosscode/crosscode/data/shuffle.py", line 57, in _batch_shuffle_iterator
+    refill()
+  File "/workspace/crosscode/crosscode/data/shuffle.py", line 48, in refill
+    for item in tqdm(islice(iterator, needed), total=needed, desc="refilling buffer"):
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 87, in example_iterator_MPD
+    for hbatch_HsMPD in iterator_HsMPD:
+  File "/workspace/crosscode/crosscode/data/activations_dataloader.py", line 77, in _iterate_activations_HsMPD
+    activations_HSMPD = self._activations_harvester.get_activations_HSMPD(seq.tokens_HS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 209, in get_activations_HSMPD
+    activations_HSPD.append(self._get_acts_HSPD(model, sequence_HS))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 185, in _get_acts_HSPD
+    cache = self._strategy.run_with_cache(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/crosscode/data/activation_harvester.py", line 115, in run_with_cache
+    model_to_run(
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 1131, in forward
+    layer_outputs = layer_module(
+                    ^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 682, in forward
+    self_attention_outputs = self.layer[0](
+                             ^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 600, in forward
+    attention_output = self.SelfAttention(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/transformers/models/t5/modeling_t5.py", line 559, in forward
+    attn_weights = nn.functional.softmax(scores.float(), dim=-1).type_as(scores)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crosscode/.venv/lib/python3.12/site-packages/torch/nn/functional.py", line 2140, in softmax
+    ret = input.softmax(dim)
+          ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.00 GiB. GPU 0 has a total capacity of 93.02 GiB of which 3.52 GiB is free. Including non-PyTorch memory, this process has 89.48 GiB memory in use. Of the allocated memory 82.39 GiB is allocated by PyTorch, and 6.37 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: lrz-hgx-h100-007: task 0: Exited with exit code 1
