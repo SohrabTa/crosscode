@@ -173,7 +173,3 @@ cython_debug/
 logs/
 docu/**/*.err
 docu/**/*.out
-docu/final_profiling/
-docu/profiling_*/
-docu/profiling_runs/
-docu/trainining_runs/
