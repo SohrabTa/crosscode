@@ -84,11 +84,18 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
      * `prepare_eval_set.py`: `--valid_shard_range 0 20 --test_shard_range 21 41 --uniprot_dir /Users/sohrab.tawana/private/data/uniprotkb_modern_score5_35k/processed_annotations`
      * Result: Filtered from 250 concepts to 141 concepts with at least 1,500 amino acids or 25 domains.
 
-8. **Embedding Generation:** Ran `InterPLM/submit.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+8. **Embedding Generation:** Generated ProtT5 embeddings for the swissprot sequences.
+   * **5k Dataset:** Ran `InterPLM/submit.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+   * **35k Dataset:** Ran `InterPLM/scripts/submit_embed.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 35k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score5_35k/`.
 
-9. **Crosscoder Feature Normalization:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize the crosscoder feature activation values between 0 and 1 using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+9. **Crosscoder Feature Normalization:** Normalized the crosscoder feature activation values between 0 and 1.
+   * **5k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
+   * **35k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 35k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score5_35k/`.
 
-10. **InterPLM Evaluation Pipeline:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node. This script ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
+10. **InterPLM Evaluation Pipeline:** Ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
+    * **5k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
+    * **35k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
+      * Result: Compared 4,792 features (with 1+ true positive) to 121 concepts. Average best F1 per concept in test set: 0.234. Number of concepts identified: 22. Number of features associated with a concept: 119.
 
 11. **Feature Activation Collection:** Ran `InterPLM/scripts/submit_collect.sh` containing `InterPLM/scripts/collect_feature_activations.py` on an `lrz-hgx-h100-94x4` node. This identified the top activating protein sequences and computed statistics for the features in the crosscoder checkpoint.
 
