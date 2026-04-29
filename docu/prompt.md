@@ -94,12 +94,19 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 
 10. **InterPLM Evaluation Pipeline:** Ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
     * **5k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
+      * Result: Compared 4,423 features (with 1+ true positive) to 33 concepts. Average best F1 per concept in test set: 0.315. Number of concepts identified: 5. Number of features associated with a concept: 67.
     * **35k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
       * Result: Compared 4,792 features (with 1+ true positive) to 121 concepts. Average best F1 per concept in test set: 0.234. Number of concepts identified: 22. Number of features associated with a concept: 119.
 
 11. **Feature Activation Collection:** Ran `InterPLM/scripts/submit_collect.sh` containing `InterPLM/scripts/collect_feature_activations.py` on an `lrz-hgx-h100-94x4` node. This identified the top activating protein sequences and computed statistics for the features in the crosscoder checkpoint.
+    * **5k Dataset:** 
+      * Result: Out of 8,192 total features, 4,737 features had activations and 3,455 were dead.
+    * **35k Dataset:** 
+      * Result: Out of 8,192 total features, 4,904 features had activations and 3,288 were dead.
 
 12. **Dashboard Cache Generation:** Ran `InterPLM/scripts/submit_create_dashboard.sh` containing `InterPLM/scripts/create_dashboard.py` on an `lrz-hgx-h100-94x4` node. This generated the data cache required for interactive visualization in the InterPLM dashboard, integrating the crosscoder features with their biological concepts.
+    * **35k Dataset:** 
+      * Result: Successfully created dashboard cache and integrated concept F1 results for 119 features.
 
 ## Training Run Config
 
