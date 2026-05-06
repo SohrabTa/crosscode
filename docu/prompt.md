@@ -87,17 +87,17 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
    * **67k Dataset:**
      * `extract_annotations.py`: `--input_uniprot_path /Users/sohrab.tawana/private/data/uniprotkb_modern_score45_67k/proteins.tsv.gz --output_dir /Users/sohrab.tawana/private/data/uniprotkb_modern_score45_67k/processed_annotations --n_shards 84`
      * `prepare_eval_set.py`: `--valid_shard_range 0 41 --test_shard_range 42 83 --uniprot_dir /Users/sohrab.tawana/private/data/uniprotkb_modern_score45_67k/processed_annotations`
-     * Result: Filtered to 219 concepts with at least 1,500 amino acids or 25 domains.
+     * Result: Filtered from 250 concepts to 219 concepts with at least 1,500 amino acids or 25 domains.
 
 8. **Embedding Generation:** Generated ProtT5 embeddings for the swissprot sequences.
    * **5k Dataset:** Ran `InterPLM/submit.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
    * **35k Dataset:** Ran `InterPLM/scripts/submit_embed.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 35k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score5_35k/`.
-   * **67k Dataset:** Ran `InterPLM/scripts/submit_embed.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 67k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score45_67k/`. (Duration: 42m)
+   * **67k Dataset:** Ran `InterPLM/scripts/submit_embed.sh` containing `InterPLM/scripts/embed_annotations.py` on an `lrz-hgx-h100-94x4` node to generate ProtT5 embeddings for the 67k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score45_67k/`.
 
 9. **Crosscoder Feature Normalization:** Normalized the crosscoder feature activation values between 0 and 1.
    * **5k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
    * **35k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 35k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score5_35k/`.
-   * **67k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 67k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score45_67k/`. (Duration: 58m)
+   * **67k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 67k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score45_67k/`.
 
 10. **InterPLM Evaluation Pipeline:** Ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
     * **5k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
