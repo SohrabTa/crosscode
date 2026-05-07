@@ -32,6 +32,8 @@ class LLMConfig(BaseModel):
 
     base_architecture_name: str | None = None
     hf_model_name: str | None = None
+    randomize_weights: bool = False
+    randomize_weights_seed: int = 42
 
     def model_post_init(self, __context: Any) -> None:
         super().model_post_init(__context)

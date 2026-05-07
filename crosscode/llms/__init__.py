@@ -24,6 +24,24 @@ def build_llms(
     return [build_llm(llm, cache_dir, device, inferenced_type)[0] for llm in llms]
 
 
+def shuffle_model_weights(model: torch.nn.Module, seed: int = 42) -> None:
+    """Shuffles the values within each weight and bias tensor of the model."""
+    logger.info(f"Shuffling values within each weight and bias to create a randomized baseline (seed={seed}).")
+    with torch.no_grad():
+        generators = {}
+        for param in model.parameters():
+            device = param.device
+            if device not in generators:
+                gen = torch.Generator(device=device)
+                gen.manual_seed(seed)
+                generators[device] = gen
+            
+            flat_param = param.view(-1)
+            indices = torch.randperm(flat_param.numel(), generator=generators[device], device=device)
+            shuffled_param = flat_param[indices].view(param.size())
+            param.copy_(shuffled_param)
+
+
 def build_llm(
     llm: LLMConfig,
     cache_dir: str,
@@ -44,6 +62,8 @@ def build_llm(
             device=device,
             dtype=dtype,
         )
+        if getattr(llm, "randomize_weights", False):
+            shuffle_model_weights(llm_out, getattr(llm, "randomize_weights_seed", 42))
         tokenizer = AutoTokenizer.from_pretrained(
             llm.name,
             revision=llm.revision,
@@ -62,6 +82,8 @@ def build_llm(
                 cache_dir=cache_dir,
                 torch_dtype=dtype,
             )
+            if getattr(llm, "randomize_weights", False):
+                shuffle_model_weights(llm_out, getattr(llm, "randomize_weights_seed", 42))
             tokenizer = T5Tokenizer.from_pretrained(
                 llm.hf_model_name,
                 do_lower_case=False,
@@ -71,9 +93,13 @@ def build_llm(
             logger.info(
                 f"Loading HuggingFace model {llm.hf_model_name} into HookedTransformer model {llm.base_architecture_name}"
             )
+            hf_model = AutoModelForCausalLM.from_pretrained(llm.hf_model_name, cache_dir=cache_dir)
+            if getattr(llm, "randomize_weights", False):
+                shuffle_model_weights(hf_model, getattr(llm, "randomize_weights_seed", 42))
+
             llm_out = HookedTransformer.from_pretrained_no_processing(
                 llm.base_architecture_name,
-                hf_model=AutoModelForCausalLM.from_pretrained(llm.hf_model_name, cache_dir=cache_dir),
+                hf_model=hf_model,
                 cache_dir=cache_dir,
                 device=device,
                 dtype=dtype,

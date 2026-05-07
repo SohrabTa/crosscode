@@ -94,18 +94,22 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
                 log = self.step % self.cfg.log_every_n_steps == 0
 
                 data_wait_time = 0.0
-                for _ in range(self.cfg.gradient_accumulation_steps_per_batch):
-                    data_start_time = time.perf_counter()
-                    batch = next(epoch_dataloader)
-                    data_wait_time += time.perf_counter() - data_start_time
+                try:
+                    for _ in range(self.cfg.gradient_accumulation_steps_per_batch):
+                        data_start_time = time.perf_counter()
+                        batch = next(epoch_dataloader)
+                        data_wait_time += time.perf_counter() - data_start_time
 
-                    loss, log_dict, tokens_trained = self.run_batch(batch, log)
-                    if self.epoch == 0:
-                        self.unique_tokens_trained += tokens_trained
+                        loss, log_dict, tokens_trained = self.run_batch(batch, log)
+                        if self.epoch == 0:
+                            self.unique_tokens_trained += tokens_trained
 
-                    loss.div(self.cfg.gradient_accumulation_steps_per_batch).backward()
-                    if log_dict is not None:
-                        log_dicts.append(log_dict)
+                        loss.div(self.cfg.gradient_accumulation_steps_per_batch).backward()
+                        if log_dict is not None:
+                            log_dicts.append(log_dict)
+                except StopIteration:
+                    logger.info("Dataloader ran out of data. Finishing training safely.")
+                    break
 
                 self._after_forward_passes()
 
