@@ -10,10 +10,11 @@ CONFIG_FILE="training_config.yaml"
 
 # Define Mounts
 CODE_DIR="/dss/dsshome1/08/ga25ley2/code/crosscode"
+INTERPLM_DIR="/dss/dsshome1/08/ga25ley2/code/InterPLM"
 DATA_DIR="/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2"
 
 # Mounts: Host:Container
-MOUNTS="${CODE_DIR}:/workspace/crosscode,${DATA_DIR}:/workspace/data"
+MOUNTS="${CODE_DIR}:/workspace/crosscode,${DATA_DIR}:/workspace/data,${INTERPLM_DIR}:/workspace/InterPLM"
 
 # Env
 export WANDB_API_KEY=$(cat wandb/api_key)
