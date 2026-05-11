@@ -70,7 +70,9 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
 2. **Container Creation:** Created `pytorch-25.12` from the squashfs file.
 3. **Interactive Test:** I successfully ran an interactive session with the mounts described above, verified WandB login, and ran a test training run.
 4. **Profiling & Instrumentation:** Instrumented `BaseTrainer` to log VRAM (peak ~24GB), throughput (~48 steps/s), and data wait time (~0ms). Found parameters that allow a full training run to complete in ~20 hours.
-5. **Training Run**: Successfully ran a training run on an `lrz-hgx-h100-94x4` node with the following [Training Run Config](#training-run-config).
+5. **Training Runs**:
+   * Successfully ran a training run on an `lrz-hgx-h100-94x4` node with the following [Training Run Config](#training-run-config).
+   * Successfully ran a baseline training run for the crosscoder model, trained on a ProtT5 model with random weights.
 6. **InterPLM Integration:** Integrated Crosscoder models with InterPLM by adding adapter classes (`CrosscoderDictionaryWrapper`), utility scripts (`run_feature_collection.py`, `run_normalization.py`), and updating dependencies.
 7. **Eval Dataset Creation:** Created evaluation datasets for the InterPLM pipeline ensuring reproducibility with the following parameters:
 
