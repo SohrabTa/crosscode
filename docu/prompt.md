@@ -100,6 +100,8 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
    * **5k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 5k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/uniprotkb_modern_score5_5k/`.
    * **35k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 35k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score5_35k/`.
    * **67k Dataset:** Ran `InterPLM/scripts/submit_normalize.sh` containing `InterPLM/interplm/sae/normalize.py` on an `lrz-hgx-h100-94x4` node to normalize using the 67k swissprot sequences in `/dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/data/uniprotkb_modern_score45_67k/`.
+   * **Baseline (67k):** Ran `InterPLM/scripts/submit_normalize.sh` for the baseline crosscoder (trained on randomized ProtT5) on an `lrz-hgx-h100-94x4` node using the 67k swissprot sequences.
+     * Result: Out of 8,192 total features, 315 features were non-zero at least once and 7,877 were dead.
 
 10. **InterPLM Evaluation Pipeline:** Ran the full evaluation pipeline, including activation comparison, F1 calculation, and metric reporting for both validation and test sets.
     * **5k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
@@ -108,6 +110,8 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
       * Result: Compared 4,792 features (with 1+ true positive) to 121 concepts. Average best F1 per concept in test set: 0.234. Number of concepts identified: 22. Number of features associated with a concept: 119.
     * **67k Dataset:** Ran `InterPLM/scripts/submit_eval.sh` containing `InterPLM/scripts/run_eval_pipeline.py` on an `lrz-hgx-h100-94x4` node.
       * Result: Compared 4,859 features (with 1+ true positive) to 219 concepts. Average best F1 per concept in test set: 0.278. Number of concepts identified: 51. Number of features associated with a concept: 219.
+    * **Baseline (67k):** Ran `InterPLM/scripts/submit_eval.sh` for the baseline crosscoder on an `lrz-hgx-h100-94x4` node.
+      * Result: Compared 310 features (with 1+ true positive) to 219 concepts. Average best F1 per concept in test set: 0.053. Number of concepts identified: 1. Number of features associated with a concept: 1.
 
 11. **Feature Activation Collection:** Ran `InterPLM/scripts/submit_collect.sh` containing `InterPLM/scripts/collect_feature_activations.py` on an `lrz-hgx-h100-94x4` node. This identified the top activating protein sequences and computed statistics for the features in the crosscoder checkpoint.
     * **5k Dataset:** 
@@ -116,12 +120,16 @@ I have downloaded the relevant LRZ documentation regarding Enroot and Slurm hand
       * Result: Out of 8,192 total features, 4,904 features had activations and 3,288 were dead.
     * **67k Dataset:** 
       * Result: Out of 8,192 total features, 4,932 features had activations and 3,260 were dead.
+    * **Baseline (67k):** 
+      * Result: Out of 8,192 total features, 315 features had activations and 7,877 were dead.
 
 12. **Dashboard Cache Generation:** Ran `InterPLM/scripts/submit_create_dashboard.sh` containing `InterPLM/scripts/create_dashboard.py` on an `lrz-hgx-h100-94x4` node. This generated the data cache required for interactive visualization in the InterPLM dashboard, integrating the crosscoder features with their biological concepts.
     * **35k Dataset:** 
       * Result: Successfully created dashboard cache and integrated concept F1 results for 119 features.
     * **67k Dataset:** 
       * Result: Successfully created dashboard cache and integrated concept F1 results for 219 features.
+    * **Baseline (67k):** 
+      * Result: Successfully created dashboard cache and integrated concept F1 results for 1 feature.
 
 ## Training Run Config
 
