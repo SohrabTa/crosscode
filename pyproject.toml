@@ -25,6 +25,8 @@ dependencies = [
     "zstandard",
     "biopython>=1.86",
     "interplm",
+    "scipy>=1.17.1",
+    "scikit-learn>=1.8.0",
 ]
 
 [project.optional-dependencies]
