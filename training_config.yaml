@@ -1,7 +1,7 @@
 data:
   token_sequence_loader:
     type: "fasta"
-    fasta_path: "/workspace/data/data/uniprot/release-2019_01/uniref/uniref50/uniref50_length_512_first_3M.fasta"
+    fasta_path: "/workspace/data/uniprot/release-2019_01/uniref/uniref50/uniref50_length_512_first_3M.fasta"
     max_sequence_length: 512
   activations_harvester:
     llms:
@@ -27,8 +27,8 @@ experiment_name: "crosscoder_l8192_k32_bs512_full_auxfix"
 wandb:
   entity: "sohrab-train"
   project: "crosscoders-protT5"
-base_save_dir: "/workspace/data/checkpoints"
-cache_dir: "/workspace/data/hf_home/"
+base_save_dir: "/workspace/model_checkpoints"
+cache_dir: "/workspace/hf_home/"
 hookpoints: [
   "encoder.blocks.1.hook_resid_post",
   "encoder.blocks.2.hook_resid_post",
