@@ -1,7 +1,7 @@
 data:
   token_sequence_loader:
     type: "fasta"
-    fasta_path: "/workspace/data/dataset/uniref50_3M_length_512.fasta"
+    fasta_path: "/workspace/data/data/uniprot/release-2019_01/uniref/uniref50/uniref50_length_512_first_3M.fasta"
     max_sequence_length: 512
   activations_harvester:
     llms:
@@ -23,7 +23,7 @@ train:
   dead_latents_threshold_n_examples: 5_000_000
   k_aux: 512 # heuristic model_dim / 2
   lambda_aux: 0.03125 # 1/32
-experiment_name: "crosscoder_l8192_k32_bs512_full"
+experiment_name: "crosscoder_l8192_k32_bs512_full_auxfix"
 wandb:
   entity: "sohrab-train"
   project: "crosscoders-protT5"
