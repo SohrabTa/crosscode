@@ -35,7 +35,7 @@ from crosscode.steering.pick_hookpoint import (
 from crosscode.utils import get_device
 
 # F1_per_domain ranked features for "Disulfide bond" from
-# data/crosscoder_eval/uniprotkb_modern_score45_67k/test_counts/heldout_top_pairings.csv
+# data/crosscoder_eval/pre-auxfix/real/uniprotkb_modern_score45_67k/test_counts/heldout_top_pairings.csv
 # and the dashboard's Sig_concepts_per_feature.csv.
 DEFAULT_DISULFIDE_FEATURES: tuple[int, ...] = (1339, 1007, 5281, 7299)
 
