@@ -62,6 +62,8 @@ class BaseModelHookpointAcausalTrainer(
 
             scaling_factors_MP = self.activations_dataloader.get_scaling_factors().to(self.device)
             self.model.with_folded_scaling_factors(scaling_factors_MP).save(checkpoint_path)
+            # Also write resumable train state alongside the periodic checkpoint.
+            self.save_train_state(checkpoint_path)
 
             if self.cfg.upload_saves_to_wandb:
                 artifact = create_checkpoint_artifact(checkpoint_path, self.wandb_run.id, self.step, self.epoch)

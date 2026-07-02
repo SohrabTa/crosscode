@@ -41,16 +41,24 @@ class ModelHookpointActivationsDataloader(ActivationsDataloader[ModelHookpointAc
         yield_batch_size_B: int,
         n_tokens_for_norm_estimate: int,
         shuffle_buffer_size: int | None,
+        norm_scaling_factors_MP: torch.Tensor | None = None,
     ):
         self._token_sequence_loader = token_sequence_loader
         self._activations_harvester = activations_harvester
         self._yield_batch_size_B = yield_batch_size_B
         self._device = self._activations_harvester._device
         self._shuffle_buffer_size = shuffle_buffer_size
-        norm_scaling_factors_MP = estimate_norm_scaling_factor_X(
-            self._iterate_activations_BMPD(),
-            n_tokens_for_norm_estimate,
-        )
+        if norm_scaling_factors_MP is None:
+            # Estimate from a sample of activations (default, fresh run).
+            norm_scaling_factors_MP = estimate_norm_scaling_factor_X(
+                self._iterate_activations_BMPD(),
+                n_tokens_for_norm_estimate,
+            )
+        else:
+            # Frozen factors passed in (e.g. chunked-resume training): reuse the
+            # first chunk's estimate so every chunk normalizes identically.
+            logger.info("Using precomputed norm scaling factors (skipping estimate).")
+            norm_scaling_factors_MP = norm_scaling_factors_MP.to(self._device)
         self._norm_scaling_factors_MP = norm_scaling_factors_MP
         self._iterator = self._iterate_activations_BMPD(norm_scaling_factors_MP)
 
@@ -117,6 +125,7 @@ def build_model_hookpoint_dataloader(
     hookpoints: list[str],
     batch_size: int,
     cache_dir: str,
+    norm_scaling_factors_MP: torch.Tensor | None = None,
 ) -> ModelHookpointActivationsDataloader:
     tokenizer = llms[0].tokenizer
     assert all(tokenizer.special_tokens_map == llm.tokenizer.special_tokens_map for llm in llms), (
@@ -166,6 +175,7 @@ def build_model_hookpoint_dataloader(
         yield_batch_size_B=batch_size,
         n_tokens_for_norm_estimate=cfg.n_tokens_for_norm_estimate,
         shuffle_buffer_size=cfg.activations_shuffle_buffer_size,
+        norm_scaling_factors_MP=norm_scaling_factors_MP,
     )
 
     return activations_dataloader

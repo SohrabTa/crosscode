@@ -89,6 +89,10 @@ class BaseTrainConfig(BaseModel):
     upload_saves_to_wandb: bool = False
     log_every_n_steps: int
     gradient_accumulation_steps_per_batch: int = 1
+    # Path to a checkpoint directory containing a train_state.pt to resume from
+    # (chunked training: each chunk continues the previous chunk's model,
+    # optimizer, global step, firing tracker and frozen norm scaling factors).
+    resume_from: str | None = None
 
     def minibatch_size(self) -> int:
         return self.batch_size // self.gradient_accumulation_steps_per_batch
@@ -135,6 +139,11 @@ class BaseExperimentConfig(BaseModel):
     base_save_dir: str = ".checkpoints"
     wandb: WandbConfig = WandbConfig()
     experiment_name: str
+    # If True (default), run_exp appends a timestamp to experiment_name so each run
+    # gets a unique save_dir. Set False for chunked-resume training so each chunk
+    # writes to a deterministic dir (base_save_dir/experiment_name) that the next
+    # chunk's --resume_from can locate.
+    append_timestamp: bool = True
     data: DataConfig
 
     @property

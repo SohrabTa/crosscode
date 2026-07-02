@@ -17,6 +17,19 @@ from crosscode.utils import get_device
 def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausalCrosscoderTrainer:
     device = get_device()
 
+    # Chunked-resume: if resuming, load the previous chunk's frozen norm scaling
+    # factors up front so the dataloader reuses them instead of re-estimating
+    # (every chunk must normalize identically). The model/optimizer/step state is
+    # restored after the trainer is built (see below).
+    resume_from = cfg.train.resume_from
+    frozen_norm_MP = None
+    resume_wandb_id = None
+    if resume_from is not None:
+        logger.info(f"Resume requested from {resume_from}; loading frozen norm + wandb run id.")
+        frozen_norm_MP = TopKStyleAcausalCrosscoderTrainer.load_norm_scaling_factors(resume_from)
+        resume_wandb_id = TopKStyleAcausalCrosscoderTrainer.load_wandb_run_id(resume_from)
+        logger.info(f"Will resume wandb run id: {resume_wandb_id}")
+
     llms = build_llms(
         cfg.data.activations_harvester.llms,
         cfg.cache_dir,
@@ -40,9 +53,15 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         hookpoints=cfg.hookpoints,
         batch_size=cfg.train.minibatch_size(),
         cache_dir=cfg.cache_dir,
+        norm_scaling_factors_MP=frozen_norm_MP,
     )
 
-    if cfg.crosscoder.init_strategy == "data_point_init":
+    if resume_from is not None:
+        # Weights are overwritten by load_train_state below, so skip the
+        # (dataloader-consuming) data-point init and use the cheap transpose init.
+        logger.info("Resuming: using AnthropicTransposeInit (weights will be overwritten).")
+        init_strategy = AnthropicTransposeInit(dec_init_norm=cfg.crosscoder.dec_init_norm)
+    elif cfg.crosscoder.init_strategy == "data_point_init":
         logger.info("Initializing with DPI")
         # Gather data points equal to n_latents
         data_points_list = []
@@ -84,9 +103,9 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         cfg.train.k_aux = d_model // 2
         logger.info(f"defaulting to k_aux={cfg.train.k_aux} for crosscoder (({d_model=}) // 2)")
 
-    wandb_run = build_wandb_run(cfg)
+    wandb_run = build_wandb_run(cfg, resume_id=resume_wandb_id)
 
-    return TopKStyleAcausalCrosscoderTrainer(
+    trainer = TopKStyleAcausalCrosscoderTrainer(
         cfg=cfg.train,
         activations_dataloader=dataloader,
         model=crosscoder,
@@ -94,6 +113,13 @@ def build_trainer(cfg: TopKAcausalCrosscoderExperimentConfig) -> TopKStyleAcausa
         device=device,
         save_dir=cfg.save_dir,
     )
+
+    if resume_from is not None:
+        # Restore model weights, optimizer, global step/epoch/token counters and
+        # firing-tracker state so the next chunk continues seamlessly.
+        trainer.load_train_state(resume_from)
+
+    return trainer
 
 
 if __name__ == "__main__":

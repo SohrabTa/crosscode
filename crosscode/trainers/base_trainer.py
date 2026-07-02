@@ -26,6 +26,13 @@ TBatch = TypeVar("TBatch")
 
 class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
     LOG_HISTOGRAMS_EVERY_N_LOGS = 10
+    # Resumable training state, saved next to each model checkpoint. Holds the
+    # UNFOLDED model weights (self.model is the training parametrization) plus the
+    # optimizer, global step/epoch/token counters, firing-tracker state (needed so
+    # AuxK dead-latent detection continues across chunks) and the frozen norm
+    # scaling factors. Distinct from the .save() artifact, which stores the FOLDED
+    # model for downstream inference.
+    TRAIN_STATE_FNAME = "train_state.pt"
 
     def __init__(
         self,
@@ -75,15 +82,76 @@ class BaseTrainer(Generic[TConfig, TModel, TBatch], ABC):
         else:
             self.model.save(checkpoint_path)
             logger.info(f"Saved {status} trained model to {checkpoint_path}")
+        # Also write a resumable train state so the next chunk can continue.
+        self.save_train_state(checkpoint_path)
+
+    def save_train_state(self, checkpoint_path: Path) -> None:
+        """Save resumable training state (see TRAIN_STATE_FNAME) into checkpoint_path."""
+        checkpoint_path = Path(checkpoint_path)
+        checkpoint_path.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "model_state_dict": self.model.state_dict(),
+                "optimizer_state_dict": self.optimizer.state_dict(),
+                "step": self.step,
+                "epoch": self.epoch,
+                "unique_tokens_trained": self.unique_tokens_trained,
+                "tokens_since_fired_L": self.firing_tracker.tokens_since_fired_L.detach().cpu(),
+                "norm_scaling_factors_MP": self.activations_dataloader.get_scaling_factors().detach().cpu(),
+                # wandb run id so the next chunk resumes the SAME run (one continuous curve).
+                "wandb_run_id": getattr(self.wandb_run, "id", None),
+            },
+            checkpoint_path / self.TRAIN_STATE_FNAME,
+        )
+        logger.info(f"Saved train state to {checkpoint_path / self.TRAIN_STATE_FNAME}")
+
+    def load_train_state(self, checkpoint_path: Path | str) -> None:
+        """Restore model, optimizer, counters and firing tracker from a train_state.pt.
+
+        The norm scaling factors are NOT applied here: they are frozen at
+        dataloader construction (see build_model_hookpoint_dataloader) via
+        load_norm_scaling_factors so that normalization is identical across chunks.
+        """
+        state_path = Path(checkpoint_path) / self.TRAIN_STATE_FNAME
+        ckpt = torch.load(state_path, map_location=self.device, weights_only=False)
+        self.model.load_state_dict(ckpt["model_state_dict"])
+        self.optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        self.step = ckpt["step"]
+        self.epoch = ckpt["epoch"]
+        self.unique_tokens_trained = ckpt["unique_tokens_trained"]
+        self.firing_tracker.tokens_since_fired_L = ckpt["tokens_since_fired_L"].to(self.device)
+        logger.info(
+            f"Resumed from {state_path}: step={self.step}, epoch={self.epoch}, "
+            f"unique_tokens_trained={self.unique_tokens_trained:,}"
+        )
+
+    @classmethod
+    def load_norm_scaling_factors(cls, checkpoint_path: Path | str) -> torch.Tensor:
+        """Read the frozen norm scaling factors from a train_state.pt (for the dataloader)."""
+        state_path = Path(checkpoint_path) / cls.TRAIN_STATE_FNAME
+        ckpt = torch.load(state_path, map_location="cpu", weights_only=False)
+        return ckpt["norm_scaling_factors_MP"]
+
+    @classmethod
+    def load_wandb_run_id(cls, checkpoint_path: Path | str) -> str | None:
+        """Read the wandb run id from a train_state.pt so the next chunk resumes the same run."""
+        state_path = Path(checkpoint_path) / cls.TRAIN_STATE_FNAME
+        ckpt = torch.load(state_path, map_location="cpu", weights_only=False)
+        return ckpt.get("wandb_run_id")
 
     def train(self) -> None:
         # scaling_factors_MP = self.activations_dataloader.get_norm_scaling_factors_MP().to(self.device)
         epoch_dataloader = self.activations_dataloader.get_activations_iterator()
 
         try:
+            # Resume-aware: start from self.step (set by load_train_state) so a
+            # chunked run continues the GLOBAL step budget (cfg.num_steps is the
+            # total across all chunks, so the LR schedule spans the whole run).
             for _ in tqdm(
-                range(self.cfg.num_steps),
+                range(self.step, self.cfg.num_steps),
                 desc="Train Steps",
+                initial=self.step,
+                total=self.cfg.num_steps,
                 smoothing=0.15,  # this loop is bursty because of activation harvesting
             ):
                 step_start_time = time.perf_counter()
@@ -200,8 +268,11 @@ def run_exp(build_trainer: Callable[[TCfg], Any], cfg_cls: type[TCfg]) -> Callab
         logger.info(f"Loaded config (raw):\n{config_dict}")
         config = cfg_cls(**config_dict)
         logger.info(f"Loaded config (parsed):\n{config.model_dump_json(indent=2)}")
-        config.experiment_name += f"_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-        logger.info(f"over-wrote experiment_name: {config.experiment_name}")
+        if config.append_timestamp:
+            config.experiment_name += f"_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            logger.info(f"over-wrote experiment_name: {config.experiment_name}")
+        else:
+            logger.info(f"append_timestamp=False; using fixed experiment_name: {config.experiment_name}")
         logger.info(f"saving in save_dir: {config.save_dir}")
         save_config(config)
         logger.info("Building trainer")

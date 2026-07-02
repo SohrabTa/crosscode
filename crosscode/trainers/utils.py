@@ -98,14 +98,21 @@ def wandb_histogram(data_X: torch.Tensor, bins: int = 100) -> wandb.Histogram | 
         raise e
 
 
-def build_wandb_run(config: BaseExperimentConfig) -> Run:
-    return wandb.init(
+def build_wandb_run(config: BaseExperimentConfig, resume_id: str | None = None) -> Run:
+    init_kwargs: dict = dict(
         name=config.experiment_name,
         project=config.wandb.project,
         entity=config.wandb.entity,
         config=config.model_dump(),
         mode=config.wandb.mode,
     )
+    if resume_id is not None:
+        # Chunked resume: continue the SAME wandb run so all chunks log to one
+        # continuous set of curves. Global self.step keeps increasing across
+        # chunks, so history appends without step collisions.
+        init_kwargs["id"] = resume_id
+        init_kwargs["resume"] = "allow"
+    return wandb.init(**init_kwargs)
 
 
 def build_optimizer(  # type: ignore
