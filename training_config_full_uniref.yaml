@@ -1,10 +1,10 @@
 # Full UniRef50 2019_01 (<=512 AA) chunked-resume training config.
 #
 # Corpus: 27,802,977 sequences / 5.63 B residues, split by chunk_uniref_corpus.py
-# into 3 balanced chunks (data/.../uniref/uniref50/chunks_512/chunk_0X.fasta).
+# into 5 balanced chunks (data/.../uniref/uniref50/chunks_512/chunk_0X.fasta).
 # num_steps below is the GLOBAL one-epoch budget over the whole corpus
 # (5,627,100,434 residues / 512 = 10,990,430). Each Slurm job trains one chunk
-# (~3.66 M steps, ~28 h at the measured 36.5 steps/s; -t 32h) and resumes from the
+# (~2.20 M steps, ~29 h at the measured 20.8 steps/s sustained; -t 34h) and resumes from the
 # previous chunk's checkpoint, so the global step counter and LR schedule span the
 # entire run. See submit_chunk.sh / run_full_uniref_chunks.sh. Architecture is HELD FIXED vs the hand-in (auxfix)
 # run: TopK/BatchTopK, 8192 latents, k=32, AuxK active.

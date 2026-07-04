@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-N_CHUNKS=3
+N_CHUNKS=5
 START=${1:-0}
 SUBMIT="scripts/submit_chunk.sh"
 
