@@ -43,7 +43,7 @@ set -euo pipefail
 cd /workspace/crosscode
 IDX=${CHUNK_IDX}
 EXP_BASE=${EXP_BASE}
-CHUNK_FASTA=/workspace/data/uniprot/release-2019_01/uniref/uniref50/chunks_512/chunk_0\${IDX}.fasta
+CHUNK_FASTA=/workspace/data/external/uniprot/release-2019_01/uniref/uniref50/chunks_512/chunk_0\${IDX}.fasta
 CFG=/tmp/train_uniref_chunk\${IDX}.yaml
 
 if [ "\${IDX}" -eq 0 ]; then
