@@ -2,8 +2,8 @@
 #SBATCH -p lrz-hgx-h100-94x4
 #SBATCH --gres=gpu:1
 #SBATCH -t 34:00:00
-#SBATCH -o logs/train_uniref_chunk_%j.out
-#SBATCH -e logs/train_uniref_chunk_%j.err
+#SBATCH -o /dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/logs/crosscode/train_uniref_chunk_%j.out
+#SBATCH -e /dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/logs/crosscode/train_uniref_chunk_%j.err
 
 # Train ONE chunk of the full-UniRef50 (<=512) corpus, resuming from the previous
 # chunk's checkpoint. Chunk index is passed via the CHUNK_IDX env var (see
@@ -33,7 +33,6 @@ MOUNTS="${CODE_DIR}:/workspace/crosscode,${DATA_DIR}:/workspace/data,${INTERPLM_
 export WANDB_API_KEY=$(cat wandb/api_key)
 export HF_HOME="/workspace/hf_home"
 export PYTHONPATH="/workspace/crosscode"
-mkdir -p logs
 
 echo "Starting full-UniRef chunk ${CHUNK_IDX} on $(hostname) at $(date)"
 

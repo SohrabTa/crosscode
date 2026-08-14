@@ -2,8 +2,8 @@
 #SBATCH -p lrz-hgx-h100-94x4
 #SBATCH --gres=gpu:1
 #SBATCH -t 34:00:00
-#SBATCH -o logs/train_baseline%j.out
-#SBATCH -e logs/train_baseline%j.err
+#SBATCH -o /dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/logs/crosscode/train_baseline%j.out
+#SBATCH -e /dss/dssfs02/lwp-dss-0001/pn67na/pn67na-dss-0000/ga25ley2/logs/crosscode/train_baseline%j.err
 
 # Define Configuration
 CONFIG_FILE="training_config_baseline.yaml"
@@ -24,7 +24,6 @@ export WANDB_API_KEY=$(cat wandb/api_key)
 export HF_HOME="/workspace/hf_home"
 export PYTHONPATH="/workspace/crosscode"
 
-mkdir -p logs
 
 echo "Starting training run on $(hostname) at $(date)"
 START_TIME=$(date +%s)
