@@ -19,8 +19,10 @@
 set -euo pipefail
 
 : "${CHUNK_IDX:?set CHUNK_IDX (0..6) via --export=ALL,CHUNK_IDX=<i>}"
-EXP_BASE="crosscoder_l8192_k32_bs512_full_uniref"
-BASE_CONFIG="training_config_full_uniref.yaml"
+# Overridable so the same script trains the real run and the random-init baseline
+# (run_full_uniref_chunks.sh forwards both through --export).
+EXP_BASE="${EXP_BASE:-crosscoder_l8192_k32_bs512_full_uniref}"
+BASE_CONFIG="${BASE_CONFIG:-training_config_full_uniref.yaml}"
 
 CODE_DIR="/dss/dsshome1/08/ga25ley2/code/crosscode"
 INTERPLM_DIR="/dss/dsshome1/08/ga25ley2/code/InterPLM"
