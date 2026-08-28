@@ -46,7 +46,7 @@ train:
   dead_latents_threshold_n_examples: 5_000_000
   k_aux: 512 # heuristic model_dim / 2
   lambda_aux: 0.03125 # 1/32
-  resume_from: null   # set by submit_chunk.sh for chunks 1..6
+  resume_from: null   # set by submit_chunk.sh for chunks 1..4
 experiment_name: "crosscoder_l8192_k32_bs512_baseline_uniref_chunk0"  # overridden per chunk
 append_timestamp: false   # deterministic save_dir per chunk (chunked resume)
 wandb:

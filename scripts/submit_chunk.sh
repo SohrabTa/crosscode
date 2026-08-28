@@ -7,7 +7,7 @@
 
 # Train ONE chunk of the full-UniRef50 (<=512) corpus, resuming from the previous
 # chunk's checkpoint. Chunk index is passed via the CHUNK_IDX env var (see
-# run_full_uniref_chunks.sh, which chains the 7 chunks with afterok dependencies).
+# run_full_uniref_chunks.sh, which chains the 5 chunks with afterok dependencies).
 #
 #   sbatch --export=ALL,CHUNK_IDX=0 scripts/submit_chunk.sh                       # first chunk
 #   sbatch --dependency=afterok:<prev> --export=ALL,CHUNK_IDX=1 scripts/submit_chunk.sh
@@ -18,7 +18,7 @@
 
 set -euo pipefail
 
-: "${CHUNK_IDX:?set CHUNK_IDX (0..6) via --export=ALL,CHUNK_IDX=<i>}"
+: "${CHUNK_IDX:?set CHUNK_IDX (0..4) via --export=ALL,CHUNK_IDX=<i>}"
 # Overridable so the same script trains the real run and the random-init baseline
 # (run_full_uniref_chunks.sh forwards both through --export).
 EXP_BASE="${EXP_BASE:-crosscoder_l8192_k32_bs512_full_uniref}"
