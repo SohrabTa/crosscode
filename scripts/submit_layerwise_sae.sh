@@ -38,6 +38,7 @@ MOUNTS="${CODE_DIR}:/workspace/crosscode,${VENV_DIR}:/workspace/venv,${DATA_DIR}
 export WANDB_API_KEY=$(cat "${MAIN_DIR}/wandb/api_key")
 export HF_HOME="/workspace/hf_home"
 export PYTHONPATH="/workspace/crosscode"
+export PYTHONDONTWRITEBYTECODE=1 # keep the shared venv read-only (no __pycache__ writes)
 
 echo "Starting layerwise SAE training (${CONFIG}) on $(hostname) at $(date), commit $(git -C "${CODE_DIR}" rev-parse HEAD)"
 
